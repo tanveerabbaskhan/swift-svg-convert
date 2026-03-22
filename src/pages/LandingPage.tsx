@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import { Upload, Download, ArrowRight, Zap, Shield, Layers, Image, FileCode, CheckCircle2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCreateConversion, useTrackEvent } from "@/hooks/use-cms-data";
 import { useNavigate } from "react-router-dom";
 
 const features = [
@@ -22,6 +23,8 @@ export default function LandingPage() {
   const [svgResult, setSvgResult] = useState<string | null>(null);
   const [converting, setConverting] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const createConversion = useCreateConversion();
+  const trackEvent = useTrackEvent();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback((f: File) => {
@@ -77,6 +80,8 @@ export default function LandingPage() {
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">${rects}</svg>`;
       setSvgResult(svg);
       setConverting(false);
+      createConversion.mutate({ file_name: file?.name || "unknown.png", file_size: file?.size || 0 });
+      trackEvent.mutate({ event_type: "conversion", page_url: "/", metadata: { file_name: file?.name } });
     };
     img.src = preview;
   }, [preview]);

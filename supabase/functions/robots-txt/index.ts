@@ -16,7 +16,7 @@ Deno.serve(async (req) => {
 
   const { data: settings } = await supabase.from("site_settings").select("value").eq("key", "robots_txt").single();
 
-  const baseUrl = "https://pngtosvg.com";
+  const baseUrl = "https://pngtosvgconverter.com";
 
   const defaultRobots = `User-agent: *
 Allow: /

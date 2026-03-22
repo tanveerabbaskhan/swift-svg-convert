@@ -57,7 +57,7 @@ export default function ContactPage() {
             <div className="rounded-xl border bg-card p-5">
               <Mail className="h-5 w-5 text-primary mb-3" />
               <p className="font-medium text-sm">Email</p>
-              <p className="text-sm text-muted-foreground">support@pngtosvg.com</p>
+              <p className="text-sm text-muted-foreground">support@pngtosvgconverter.com</p>
             </div>
             <div className="rounded-xl border bg-card p-5">
               <MessageSquare className="h-5 w-5 text-primary mb-3" />

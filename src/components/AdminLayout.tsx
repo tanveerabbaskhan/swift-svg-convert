@@ -76,7 +76,7 @@ export default function AdminLayout() {
               <div className="h-8 w-8 rounded-full bg-sidebar-primary flex items-center justify-center text-xs font-bold text-sidebar-primary-foreground">{(user?.email?.[0] || "A").toUpperCase()}</div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-sidebar-accent-foreground truncate">{user?.email?.split("@")[0] || "Admin"}</p>
-                <p className="text-xs text-sidebar-foreground truncate">{user?.email || "admin@pngtosvg.com"}</p>
+                <p className="text-xs text-sidebar-foreground truncate">{user?.email || "admin@pngtosvgconverter.com"}</p>
               </div>
             </div>
           )}

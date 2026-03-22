@@ -52,7 +52,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="mt-1.5"
-              placeholder="admin@pngtosvg.com"
+              placeholder="admin@pngtosvgconverter.com"
               required
               autoFocus
             />

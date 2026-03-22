@@ -14,7 +14,7 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 
-  const baseUrl = "https://pngtosvg.com";
+  const baseUrl = "https://pngtosvgconverter.com";
 
   const { data: pages } = await supabase.from("pages").select("slug, updated_at, noindex").eq("status", "published");
   const { data: posts } = await supabase.from("blog_posts").select("slug, updated_at, noindex").eq("status", "published");

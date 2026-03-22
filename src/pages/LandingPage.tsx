@@ -80,6 +80,8 @@ export default function LandingPage() {
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">${rects}</svg>`;
       setSvgResult(svg);
       setConverting(false);
+      createConversion.mutate({ file_name: file?.name || "unknown.png", file_size: file?.size || 0 });
+      trackEvent.mutate({ event_type: "conversion", page_url: "/", metadata: { file_name: file?.name } });
     };
     img.src = preview;
   }, [preview]);

@@ -1,4 +1,4 @@
-import { Save, Globe, Bell, Shield, ImageIcon, Upload } from "lucide-react";
+import { Save, Globe, Bell, Shield, ImageIcon, Upload, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";

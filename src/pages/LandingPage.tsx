@@ -18,24 +18,35 @@ type ConversionFile = {
 };
 
 const features = [
-  { icon: Zap, title: "Lightning Fast", desc: "Convert your PNG files to SVG format in seconds with our optimized engine." },
-  { icon: Shield, title: "Secure & Private", desc: "Files are processed locally in your browser. Nothing is uploaded to any server." },
-  { icon: Layers, title: "High Quality", desc: "Advanced tracing algorithms preserve detail and produce clean vector paths." },
+  { icon: Zap, title: "True Vectorization — Not Base64", desc: "We trace your image pixel-by-pixel and rebuild it as real SVG paths. Not a wrapper. Not an embed. A genuine vector file." },
+  { icon: Layers, title: "Colors Preserved — Full Color Output", desc: "Keep every color from your original PNG. Our color tracing mode rebuilds each color region as a separate vector path." },
+  { icon: Image, title: "Transparent Backgrounds Supported", desc: "Upload a PNG with no background. Get an SVG with no background. No white fill. No unexpected background color." },
+  { icon: Shield, title: "No Signup Required — Ever", desc: "Open the page. Upload your file. Download your SVG. No account. No email. No password. No credit card." },
+  { icon: FileCode, title: "No Watermark on Output", desc: "Your converted SVG file is clean. No branding. No overlay. No locked quality behind a paywall." },
+  { icon: Shield, title: "Runs Entirely in Your Browser", desc: "Your PNG never leaves your device. Processing happens locally — no file upload to a server. Completely private." },
+  { icon: Layers, title: "Works for Logos, Icons, and Cricut Files", desc: "Flat images with clear edges convert perfectly. Logos, icons, clip art, and Cricut cut files all supported." },
+  { icon: Zap, title: "Black and White + Full Color Modes", desc: "Monochrome images use our black and white preset for the cleanest edges. Color images use full color tracing." },
 ];
 
 const steps = [
-  { num: "01", title: "Upload PNG", desc: "Drag & drop or select one or multiple PNG files." },
-  { num: "02", title: "Auto Convert", desc: "Files are processed instantly with a real-time preview." },
-  { num: "03", title: "Download SVG", desc: "Download individual files or all at once." },
+  { num: "01", title: "Upload Your PNG", desc: "Click the upload area or drag and drop your PNG file directly onto the converter. Supports PNG files of any size. No file size limits." },
+  { num: "02", title: "Choose Your Settings", desc: "Select Full Color mode to preserve all colors from your original image. Select Black and White mode for logos, icons, and line art with the cleanest edge tracing." },
+  { num: "03", title: "Download Your SVG", desc: "Click Convert. Your PNG is traced into real SVG vector paths — not embedded as Base64. Download your clean, scalable SVG file instantly. No watermark." },
 ];
 
 const faqs = [
-  { q: "Is this tool really free?", a: "Yes, PNGTOSVG is completely free with no hidden fees, no sign-up required, and no usage limits." },
-  { q: "Are my files uploaded to a server?", a: "No. All conversion happens directly in your browser using HTML5 Canvas. Your files never leave your device, ensuring complete privacy." },
-  { q: "What is the maximum file size?", a: "We support PNG files up to 10MB each. For bulk conversions, you can upload multiple files at once." },
-  { q: "Can I convert multiple files at once?", a: "Yes! Our bulk conversion feature lets you drag & drop or select multiple PNG files and convert them all simultaneously." },
-  { q: "What browsers are supported?", a: "PNGTOSVG works on all modern browsers including Chrome, Firefox, Safari, and Edge on both desktop and mobile devices." },
-  { q: "How does the conversion work?", a: "We use color quantization and optimized SVG path generation to trace your PNG image into scalable vector graphics while preserving as much detail as possible." },
+  { q: "What is a PNG to SVG converter?", a: "A PNG to SVG converter transforms raster images made of pixels into scalable vector graphics built from mathematical paths. True converters rebuild images as vector paths, while fake ones simply embed the PNG inside an SVG file." },
+  { q: "How do I convert PNG to SVG for free?", a: "Upload your PNG, choose Full Color or Black and White mode, click Convert, and download your SVG instantly. No signup, no watermark, and no payment required." },
+  { q: "Why does my SVG look blurry or pixelated after conversion?", a: "This usually means the file is a Base64-embedded PNG inside an SVG. A real SVG created through vectorization will stay sharp at any size." },
+  { q: "How do I keep the colors when converting PNG to SVG?", a: "Use Full Color mode. This traces each color region separately and preserves the original color details." },
+  { q: "Is it possible to convert a raster image to a real vector automatically?", a: "Yes, especially for logos, icons, and simple graphics. Complex images with gradients may require manual cleanup." },
+  { q: "What types of PNG files convert best to SVG?", a: "Images with clear edges, flat colors, and high contrast — like logos, icons, and line art — produce the best results." },
+  { q: "Why is my converted SVG file so large?", a: "Complex images create more vector paths. Use an optimizer or simplify the original PNG before converting." },
+  { q: "Why does my SVG have a white background?", a: "This happens when transparency isn't preserved. Enable the transparency option before converting." },
+  { q: "Can I convert PNG to SVG without losing quality?", a: "Yes. Once converted into vector paths, SVG files scale infinitely without losing quality." },
+  { q: "What is the difference between PNG and SVG?", a: "PNG is pixel-based and loses quality when scaled. SVG is vector-based and remains sharp at any size." },
+  { q: "Do I need to create an account to use this converter?", a: "No. You can upload, convert, and download files without signing up." },
+  { q: "How does image tracing work in SVG conversion?", a: "Image tracing detects edges and color regions in a PNG and converts them into mathematical curves and vector paths, creating a scalable version of the image." },
 ];
 
 function convertPng(preview: string, onProgress: (p: number) => void): Promise<string> {
@@ -187,14 +198,15 @@ export default function LandingPage() {
           <div className="mx-auto max-w-3xl text-center animate-fade-up">
             <div className="mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-full border bg-card px-3 sm:px-4 py-1.5 text-xs sm:text-sm text-muted-foreground shadow-sm">
               <Zap className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-accent" />
-              Free, fast & private — no uploads to server
+              Free. No signup. No watermark. No file size limit.
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.08]">
-              Convert <span className="text-gradient">PNG to SVG</span> in seconds
+              Free <span className="text-gradient">PNG to SVG</span> Converter — Convert Raster Images to Scalable Vector Graphics Online
             </h1>
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed px-2">
-              Transform raster images into scalable vectors. Bulk convert, real-time preview, 100% browser-based.
+            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
+              Upload your PNG. Get a real SVG — not a Base64 wrapper. Most free converters embed your PNG inside an SVG file without any actual vectorization. Ours performs true image tracing — converting your raster pixels into clean, scalable SVG paths that resize without quality loss.
             </p>
+            <p className="mt-3 text-sm text-muted-foreground font-medium">Works in your browser. Completely private.</p>
             {/* Live counter */}
             <div className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
@@ -297,16 +309,15 @@ export default function LandingPage() {
       <section id="features" className="py-12 sm:py-20 bg-muted/30">
         <div className="container px-4 sm:px-6">
           <div className="text-center mb-10 sm:mb-16 animate-fade-up">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Why choose {siteName}?</h2>
-            <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-sm sm:text-base">The fastest, most private way to convert your raster images to scalable vectors.</p>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Everything You Were Frustrated About With Other Converters — Fixed</h2>
           </div>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8 max-w-4xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
             {features.map((f, i) => (
-              <div key={f.title} className={`rounded-2xl border bg-card p-6 sm:p-8 shadow-sm hover:shadow-md transition-shadow duration-300 animate-fade-up stagger-${i + 1}`}>
-                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl gradient-primary flex items-center justify-center mb-4 sm:mb-5 shadow-md shadow-primary/15">
-                  <f.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
+              <div key={f.title} className={`rounded-2xl border bg-card p-6 shadow-sm hover:shadow-md transition-shadow duration-300 animate-fade-up stagger-${Math.min(i + 1, 4)}`}>
+                <div className="h-10 w-10 rounded-xl gradient-primary flex items-center justify-center mb-4 shadow-md shadow-primary/15">
+                  <f.icon className="h-4 w-4 text-primary-foreground" />
                 </div>
-                <h3 className="font-semibold text-base sm:text-lg mb-2">{f.title}</h3>
+                <h3 className="font-semibold text-sm sm:text-base mb-2">{f.title}</h3>
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
               </div>
             ))}
@@ -314,47 +325,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Content: What is PNG to SVG */}
-      <section className="py-12 sm:py-20">
-        <div className="container max-w-4xl px-4 sm:px-6">
-          <div className="grid md:grid-cols-2 gap-8 sm:gap-12 items-center animate-fade-up">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-4">What is PNG to SVG conversion?</h2>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-4">
-                PNG (Portable Network Graphics) is a raster image format made of pixels. SVG (Scalable Vector Graphics) uses mathematical paths, making images infinitely scalable without quality loss.
-              </p>
-              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                Converting PNG to SVG is essential for logos, icons, and illustrations that need to look sharp at any size — from mobile screens to billboards.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-xl border bg-card p-4 sm:p-5 text-center">
-                <p className="text-2xl sm:text-3xl font-bold text-gradient">∞</p>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1">Scalable</p>
-              </div>
-              <div className="rounded-xl border bg-card p-4 sm:p-5 text-center">
-                <p className="text-2xl sm:text-3xl font-bold text-gradient">0</p>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1">Quality Loss</p>
-              </div>
-              <div className="rounded-xl border bg-card p-4 sm:p-5 text-center">
-                <p className="text-2xl sm:text-3xl font-bold text-gradient">CSS</p>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1">Stylable</p>
-              </div>
-              <div className="rounded-xl border bg-card p-4 sm:p-5 text-center">
-                <p className="text-2xl sm:text-3xl font-bold text-gradient">SEO</p>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1">Friendly</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How it Works */}
-      <section id="how-it-works" className="py-12 sm:py-20 bg-muted/30">
+      {/* How to Convert PNG to SVG */}
+      <section id="how-it-works" className="py-12 sm:py-20">
         <div className="container max-w-4xl px-4 sm:px-6">
           <div className="text-center mb-10 sm:mb-16 animate-fade-up">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">How it works</h2>
-            <p className="mt-3 text-muted-foreground text-sm sm:text-base">Three simple steps to get your SVG file.</p>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">How to Convert PNG to SVG — Three Steps</h2>
           </div>
           <div className="grid sm:grid-cols-3 gap-6 sm:gap-8">
             {steps.map((s, i) => (
@@ -364,6 +339,69 @@ export default function LandingPage() {
                 <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* What Is a PNG to SVG Converter? */}
+      <section className="py-12 sm:py-20 bg-muted/30">
+        <div className="container max-w-4xl px-4 sm:px-6">
+          <div className="animate-fade-up">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-4">What Is a PNG to SVG Converter?</h2>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-6">
+              A PNG to SVG converter is a tool that transforms raster images — built from fixed pixel grids — into scalable vector graphics defined by mathematical paths and geometric shapes. This process is called vectorization or image tracing.
+            </p>
+
+            <h3 className="text-xl sm:text-2xl font-bold tracking-tight mb-3">Why Convert PNG to SVG?</h3>
+            <ul className="space-y-2 text-sm sm:text-base text-muted-foreground leading-relaxed mb-6 list-disc pl-5">
+              <li>Your logo needs to be printed at large format — PNG becomes pixelated, SVG scales without limits.</li>
+              <li>You need to use your image in Cricut, Silhouette, or a vinyl cutting machine — these require SVG files.</li>
+              <li>You are building a website and need icons that stay sharp on retina displays and any screen size.</li>
+              <li>Your design tool exported PNG but you need an editable vector file for a client.</li>
+              <li>You want to import your image into Figma, Inkscape, or Illustrator as an editable vector.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* PNG vs SVG */}
+      <section className="py-12 sm:py-20">
+        <div className="container max-w-4xl px-4 sm:px-6">
+          <div className="animate-fade-up">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-4">PNG vs SVG — What Actually Happens to Your Image</h2>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-4">
+              PNG stores your image as a grid of pixels. Every pixel has a fixed color. When you enlarge a PNG beyond its original size, those pixels stretch — creating blur and pixelation.
+            </p>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed mb-4">
+              SVG stores your image differently. Instead of pixels, it uses mathematical descriptions of shapes, curves, and paths. Because these shapes are defined by coordinates and curves, they can scale to any size without losing quality.
+            </p>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              Converting PNG to SVG means analyzing pixel groups, detecting edges and color regions, and recreating them as vector paths. The result is a true vector file — not a pixel image inside an SVG container.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Common Problems */}
+      <section className="py-12 sm:py-20 bg-muted/30">
+        <div className="container max-w-4xl px-4 sm:px-6">
+          <div className="animate-fade-up">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-6">Common Problems After Converting PNG to SVG — And How We Handle Them</h2>
+            <div className="space-y-6">
+              {[
+                { title: "SVG looks blurry or cartoonish after conversion", desc: "Our image tracing uses edge-detection algorithms to preserve sharp boundaries. Use High Fidelity mode for complex images and Low Fidelity for logos." },
+                { title: "Colors look completely different after conversion", desc: "Full Color tracing mode rebuilds each color region separately. Adjust color precision for better accuracy." },
+                { title: "Parts of my logo went missing after tracing", desc: "Use the path cleanup tool to manually refine or restore missing areas." },
+                { title: "SVG file is too large", desc: "Use the SVG optimizer to reduce path count without visible quality loss." },
+                { title: "White background appeared even though PNG was transparent", desc: "Transparency is preserved by default. Ensure the \"Preserve Transparency\" option is enabled." },
+                { title: "SVG looks pixelated", desc: "This happens when using fake converters that embed PNG as Base64. Our tool creates real vector paths." },
+              ].map((item) => (
+                <div key={item.title} className="rounded-xl border bg-card p-5 sm:p-6">
+                  <h3 className="font-semibold text-sm sm:text-base mb-2">{item.title}</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -401,7 +439,7 @@ export default function LandingPage() {
       <section id="faq" className="py-12 sm:py-20 bg-muted/30">
         <div className="container max-w-2xl px-4 sm:px-6">
           <div className="text-center mb-10 sm:mb-12 animate-fade-up">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Frequently asked questions</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Frequently Asked Questions</h2>
           </div>
           <Accordion type="single" collapsible className="space-y-3 animate-fade-up stagger-1">
             {faqs.map((faq, i) => (

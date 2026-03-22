@@ -23,6 +23,8 @@ export default function LandingPage() {
   const [svgResult, setSvgResult] = useState<string | null>(null);
   const [converting, setConverting] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const createConversion = useCreateConversion();
+  const trackEvent = useTrackEvent();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = useCallback((f: File) => {

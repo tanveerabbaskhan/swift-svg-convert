@@ -1,10 +1,12 @@
-import { FileCode } from "lucide-react";
+import { FileCode, Moon, Sun } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "next-themes";
 import { useSiteSettings } from "@/hooks/use-cms-data";
 import { useDynamicHead } from "@/hooks/use-dynamic-head";
 
 export default function PublicPageLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const settings = useDynamicHead(); // applies title, favicon, GA, GSC
   const siteName = settings?.site_name || "PNGTOSVG";
   const siteLogo = settings?.site_logo || "";
@@ -29,6 +31,13 @@ export default function PublicPageLayout({ children }: { children: React.ReactNo
             <a href="/" className="hover:text-foreground transition-colors">Home</a>
             <a href="/about" className="hover:text-foreground transition-colors">About</a>
             <a href="/contact" className="hover:text-foreground transition-colors">Contact</a>
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="h-8 w-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
           </nav>
         </div>
       </header>

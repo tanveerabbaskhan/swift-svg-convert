@@ -1,22 +1,28 @@
 import PublicPageLayout from "@/components/PublicPageLayout";
-import { usePages } from "@/hooks/use-cms-data";
+import { usePages, useCreateContactSubmission } from "@/hooks/use-cms-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Mail, MessageSquare, Send } from "lucide-react";
+import { Mail, MessageSquare, Send, Loader2 } from "lucide-react";
 
 export default function ContactPage() {
   const { data: pages } = usePages();
   const page = pages?.find(p => p.slug === "/contact");
   const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const createSubmission = useCreateContactSubmission();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Message sent! We'll get back to you soon.");
-    setForm({ name: "", email: "", message: "" });
+    try {
+      await createSubmission.mutateAsync(form);
+      toast.success("Message sent! We'll get back to you soon.");
+      setForm({ name: "", email: "", message: "" });
+    } catch {
+      toast.error("Failed to send message. Please try again.");
+    }
   };
 
   return (
@@ -42,7 +48,10 @@ export default function ContactPage() {
               <Label>Message</Label>
               <Textarea value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} className="mt-1.5" rows={5} required />
             </div>
-            <Button type="submit" variant="hero" size="lg"><Send className="h-4 w-4 mr-2" /> Send Message</Button>
+            <Button type="submit" variant="hero" size="lg" disabled={createSubmission.isPending}>
+              {createSubmission.isPending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Send className="h-4 w-4 mr-2" />}
+              {createSubmission.isPending ? "Sending..." : "Send Message"}
+            </Button>
           </form>
           <div className="md:col-span-2 space-y-6">
             <div className="rounded-xl border bg-card p-5">
@@ -61,3 +70,4 @@ export default function ContactPage() {
     </PublicPageLayout>
   );
 }
+

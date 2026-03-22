@@ -1,9 +1,11 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Upload, Download, ArrowRight, Zap, Shield, Layers, Image, FileCode, X, Check, Trash2, ExternalLink, Palette, Eye, Lock, Scissors, Moon, Sun, ArrowDown, CheckCircle2 } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useCreateConversion, useTrackEvent, useSiteSettings } from "@/hooks/use-cms-data";
 import { useDynamicHead } from "@/hooks/use-dynamic-head";
+import { traceImage } from "@/lib/image-tracer";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -63,32 +65,16 @@ function convertPng(preview: string, onProgress: (p: number) => void): Promise<s
     const img = new window.Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
-      onProgress(20);
+      onProgress(10);
       const canvas = document.createElement("canvas");
       const w = Math.min(img.width, 800);
       const h = Math.round((img.height / img.width) * w);
       canvas.width = w; canvas.height = h;
       const ctx = canvas.getContext("2d")!;
       ctx.drawImage(img, 0, 0, w, h);
-      onProgress(40);
-      const data = ctx.getImageData(0, 0, w, h);
-      const blockSize = 4;
-      let rects = "";
-      const totalBlocks = Math.ceil(h / blockSize) * Math.ceil(w / blockSize);
-      let done = 0;
-      for (let y = 0; y < h; y += blockSize) {
-        for (let x = 0; x < w; x += blockSize) {
-          const idx = (y * w + x) * 4;
-          const r = data.data[idx], g = data.data[idx+1], b = data.data[idx+2], a = data.data[idx+3];
-          if (a < 20) { done++; continue; }
-          const rr = Math.round(r/32)*32, gg = Math.round(g/32)*32, bb = Math.round(b/32)*32;
-          rects += `<rect x="${x}" y="${y}" width="${blockSize}" height="${blockSize}" fill="rgb(${rr},${gg},${bb})" opacity="${(a/255).toFixed(2)}"/>`;
-          done++;
-        }
-        onProgress(40 + Math.round((done / totalBlocks) * 55));
-      }
-      onProgress(98);
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}">${rects}</svg>`;
+      onProgress(15);
+      const imageData = ctx.getImageData(0, 0, w, h);
+      const svg = traceImage(imageData, w, h, 16, 1.0, onProgress);
       setTimeout(() => { onProgress(100); resolve(svg); }, 100);
     };
     img.src = preview;
@@ -97,6 +83,7 @@ function convertPng(preview: string, onProgress: (p: number) => void): Promise<s
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const [files, setFiles] = useState<ConversionFile[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [totalConverted, setTotalConverted] = useState<number>(0);
@@ -212,6 +199,13 @@ export default function LandingPage() {
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
             <a href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline">About</a>
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
             <Button variant="ghost" size="sm" onClick={() => navigate("/admin")} className="text-xs sm:text-sm">Dashboard</Button>
           </div>
         </div>

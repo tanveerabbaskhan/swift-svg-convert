@@ -6,6 +6,7 @@ import {
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useSiteSettings } from "@/hooks/use-cms-data";
+import { useAuth } from "@/components/AuthProvider";
 
 const navItems = [
   { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true },
@@ -20,6 +21,7 @@ const navItems = [
 export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const { data: settings } = useSiteSettings();
   const siteName = settings?.site_name || "PNGTOSVG";
   const siteLogo = settings?.site_logo || "";
@@ -71,16 +73,16 @@ export default function AdminLayout() {
         <div className="p-3 border-t border-sidebar-border">
           {!collapsed && (
             <div className="flex items-center gap-3 px-2 py-2 mb-2">
-              <div className="h-8 w-8 rounded-full bg-sidebar-primary flex items-center justify-center text-xs font-bold text-sidebar-primary-foreground">A</div>
+              <div className="h-8 w-8 rounded-full bg-sidebar-primary flex items-center justify-center text-xs font-bold text-sidebar-primary-foreground">{(user?.email?.[0] || "A").toUpperCase()}</div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-sidebar-accent-foreground truncate">Admin User</p>
-                <p className="text-xs text-sidebar-foreground truncate">admin@pngtosvg.com</p>
+                <p className="text-sm font-medium text-sidebar-accent-foreground truncate">{user?.email?.split("@")[0] || "Admin"}</p>
+                <p className="text-xs text-sidebar-foreground truncate">{user?.email || "admin@pngtosvg.com"}</p>
               </div>
             </div>
           )}
-          <Button variant="ghost" size="sm" className={`w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${collapsed ? "px-0 justify-center" : "justify-start"}`} onClick={() => navigate("/")}>
+          <Button variant="ghost" size="sm" className={`w-full text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${collapsed ? "px-0 justify-center" : "justify-start"}`} onClick={async () => { await signOut(); navigate("/admin/login"); }}>
             <LogOut className="h-4 w-4" />
-            {!collapsed && <span className="ml-2">Back to Site</span>}
+            {!collapsed && <span className="ml-2">Sign Out</span>}
           </Button>
         </div>
       </aside>

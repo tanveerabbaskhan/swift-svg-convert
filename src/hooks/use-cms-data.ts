@@ -247,3 +247,15 @@ export function useDashboardStats() {
     },
   });
 }
+
+// ===== CONTACT SUBMISSIONS =====
+export function useCreateContactSubmission() {
+  return useMutation({
+    mutationFn: async (submission: { name: string; email: string; message: string }) => {
+      const { error } = await supabase.from("contact_submissions" as any).insert(submission);
+      if (error) throw error;
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+}
+

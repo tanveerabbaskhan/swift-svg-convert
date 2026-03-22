@@ -329,9 +329,11 @@ export default function LandingPage() {
                             </div>
                           )}
                           {cf.status === "done" && (
-                            <div className="mt-2 flex items-center gap-2">
-                              <span className="text-xs text-success flex items-center gap-1"><Check className="h-3 w-3" /> Converted</span>
-                              <Button variant="ghost" size="sm" className="h-6 text-xs px-2" onClick={() => downloadSvg(cf)}><Download className="h-3 w-3 mr-1" /> SVG</Button>
+                            <div className="mt-3">
+                              <span className="text-xs text-success flex items-center gap-1 mb-2"><Check className="h-3 w-3" /> Converted successfully</span>
+                              <Button variant="hero" size="lg" className="w-full text-sm font-semibold" onClick={() => downloadSvg(cf)}>
+                                <Download className="h-4 w-4 mr-2" /> Download the Converted SVG
+                              </Button>
                             </div>
                           )}
                           {cf.status === "pending" && cf.preview && (

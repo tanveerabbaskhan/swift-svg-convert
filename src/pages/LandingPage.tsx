@@ -80,6 +80,8 @@ export default function LandingPage() {
   const [files, setFiles] = useState<ConversionFile[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [totalConverted, setTotalConverted] = useState<number>(0);
+  const { data: siteSettings } = useSiteSettings();
+  const trustpilotUrl = siteSettings?.trustpilot_url || "";
   const createConversion = useCreateConversion();
   const trackEvent = useTrackEvent();
   const inputRef = useRef<HTMLInputElement>(null);

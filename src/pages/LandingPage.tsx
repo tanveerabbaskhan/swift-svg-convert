@@ -108,6 +108,24 @@ export default function LandingPage() {
   const trackEvent = useTrackEvent();
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // FAQ Schema (JSON-LD)
+  useEffect(() => {
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqs.map(f => ({
+        "@type": "Question",
+        "name": f.q,
+        "acceptedAnswer": { "@type": "Answer", "text": f.a }
+      }))
+    };
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify(schema);
+    document.head.appendChild(script);
+    return () => { document.head.removeChild(script); };
+  }, []);
+
   useEffect(() => {
     trackEvent.mutate({ event_type: "page_view", page_url: "/" });
     supabase.from("conversions").select("*", { count: "exact", head: true }).then(({ count }) => {

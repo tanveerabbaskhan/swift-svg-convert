@@ -3,6 +3,7 @@ import { Upload, Download, ArrowRight, Zap, Shield, Layers, Image, FileCode, X, 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useCreateConversion, useTrackEvent, useSiteSettings } from "@/hooks/use-cms-data";
+import { useDynamicHead } from "@/hooks/use-dynamic-head";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -27,7 +28,6 @@ const steps = [
   { num: "02", title: "Auto Convert", desc: "Files are processed instantly with a real-time preview." },
   { num: "03", title: "Download SVG", desc: "Download individual files or all at once." },
 ];
-
 
 const faqs = [
   { q: "Is this tool really free?", a: "Yes, PNGTOSVG is completely free with no hidden fees, no sign-up required, and no usage limits." },
@@ -80,8 +80,10 @@ export default function LandingPage() {
   const [files, setFiles] = useState<ConversionFile[]>([]);
   const [dragOver, setDragOver] = useState(false);
   const [totalConverted, setTotalConverted] = useState<number>(0);
-  const { data: siteSettings } = useSiteSettings();
-  const trustpilotUrl = siteSettings?.trustpilot_url || "";
+  const settings = useDynamicHead(); // applies title, favicon, GA, GSC dynamically
+  const siteName = settings?.site_name || "PNGTOSVG";
+  const siteLogo = settings?.site_logo || "";
+  const trustpilotUrl = settings?.trustpilot_url || "";
   const createConversion = useCreateConversion();
   const trackEvent = useTrackEvent();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -156,10 +158,14 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur-md safe-top">
         <div className="container flex h-14 sm:h-16 items-center justify-between px-4 sm:px-6">
           <button onClick={() => navigate("/")} className="flex items-center gap-2 font-bold text-lg sm:text-xl tracking-tight">
-            <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg gradient-primary flex items-center justify-center">
-              <FileCode className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-foreground" />
-            </div>
-            <span>PNGTOSVG</span>
+            {siteLogo ? (
+              <img src={siteLogo} alt={siteName} className="h-7 sm:h-8 max-w-[140px] object-contain" />
+            ) : (
+              <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg gradient-primary flex items-center justify-center">
+                <FileCode className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-foreground" />
+              </div>
+            )}
+            {!siteLogo && <span>{siteName}</span>}
           </button>
           <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
             <a href="#converter" className="hover:text-foreground transition-colors">Converter</a>
@@ -291,7 +297,7 @@ export default function LandingPage() {
       <section id="features" className="py-12 sm:py-20 bg-muted/30">
         <div className="container px-4 sm:px-6">
           <div className="text-center mb-10 sm:mb-16 animate-fade-up">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Why choose PNGTOSVG?</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Why choose {siteName}?</h2>
             <p className="mt-3 text-muted-foreground max-w-lg mx-auto text-sm sm:text-base">The fastest, most private way to convert your raster images to scalable vectors.</p>
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8 max-w-4xl mx-auto">
@@ -425,17 +431,23 @@ export default function LandingPage() {
       <footer className="border-t py-8 sm:py-12 bg-muted/20">
         <div className="container flex flex-col gap-4 sm:flex-row items-center justify-between text-sm text-muted-foreground px-4 sm:px-6">
           <div className="flex items-center gap-2 font-semibold text-foreground">
-            <div className="h-6 w-6 rounded-md gradient-primary flex items-center justify-center">
-              <FileCode className="h-3 w-3 text-primary-foreground" />
-            </div>
-            PNGTOSVG
+            {siteLogo ? (
+              <img src={siteLogo} alt={siteName} className="h-6 max-w-[120px] object-contain" />
+            ) : (
+              <>
+                <div className="h-6 w-6 rounded-md gradient-primary flex items-center justify-center">
+                  <FileCode className="h-3 w-3 text-primary-foreground" />
+                </div>
+                {siteName}
+              </>
+            )}
           </div>
           <div className="flex items-center gap-4 text-xs">
             <a href="/about" className="hover:text-foreground transition-colors">About</a>
             <a href="/contact" className="hover:text-foreground transition-colors">Contact</a>
             <a href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</a>
           </div>
-          <p className="text-xs">© {new Date().getFullYear()} PNGTOSVG. All rights reserved.</p>
+          <p className="text-xs">© {new Date().getFullYear()} {siteName}. All rights reserved.</p>
         </div>
       </footer>
     </div>

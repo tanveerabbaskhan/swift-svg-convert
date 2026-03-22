@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useSiteSettings } from "@/hooks/use-cms-data";
 
 const navItems = [
   { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true },
@@ -19,6 +20,9 @@ const navItems = [
 export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const navigate = useNavigate();
+  const { data: settings } = useSiteSettings();
+  const siteName = settings?.site_name || "PNGTOSVG";
+  const siteLogo = settings?.site_logo || "";
 
   return (
     <div className="flex min-h-screen bg-background">
@@ -27,10 +31,16 @@ export default function AdminLayout() {
         <div className={`h-16 flex items-center ${collapsed ? "justify-center" : "px-5"} border-b border-sidebar-border`}>
           {!collapsed && (
             <button onClick={() => navigate("/")} className="flex items-center gap-2.5 font-bold text-lg text-sidebar-accent-foreground">
-              <div className="h-7 w-7 rounded-lg bg-sidebar-primary flex items-center justify-center">
-                <FileCode className="h-3.5 w-3.5 text-sidebar-primary-foreground" />
-              </div>
-              PNGTOSVG
+              {siteLogo ? (
+                <img src={siteLogo} alt={siteName} className="h-7 max-w-[130px] object-contain brightness-0 invert" />
+              ) : (
+                <>
+                  <div className="h-7 w-7 rounded-lg bg-sidebar-primary flex items-center justify-center">
+                    <FileCode className="h-3.5 w-3.5 text-sidebar-primary-foreground" />
+                  </div>
+                  {siteName}
+                </>
+              )}
             </button>
           )}
           <button onClick={() => setCollapsed(!collapsed)} className={`${collapsed ? "" : "ml-auto"} h-7 w-7 flex items-center justify-center rounded-md hover:bg-sidebar-accent text-sidebar-foreground transition-colors`}>

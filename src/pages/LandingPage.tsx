@@ -28,12 +28,6 @@ const steps = [
   { num: "03", title: "Download SVG", desc: "Download individual files or all at once." },
 ];
 
-const reviews = [
-  { name: "Sarah M.", role: "Graphic Designer", rating: 5, text: "The fastest PNG to SVG converter I've found. The quality is remarkable and I love that nothing gets uploaded." },
-  { name: "James K.", role: "Web Developer", rating: 5, text: "Bulk conversion saved me hours. I converted 50+ icons in under a minute. Absolutely essential tool." },
-  { name: "Priya R.", role: "UI/UX Lead", rating: 4, text: "Clean interface, does exactly what it promises. The real-time preview is a great touch." },
-  { name: "Marco T.", role: "Freelancer", rating: 5, text: "Privacy-first approach is what sold me. No server uploads means I can use it for client work without worry." },
-];
 
 const faqs = [
   { q: "Is this tool really free?", a: "Yes, PNGTOSVG is completely free with no hidden fees, no sign-up required, and no usage limits." },

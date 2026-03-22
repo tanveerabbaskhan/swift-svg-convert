@@ -29,7 +29,7 @@ export default function SettingsPage() {
     if (settings) {
       setForm({
         site_name: settings.site_name || "", site_description: settings.site_description || "",
-        site_url: settings.site_url || "", site_logo: settings.site_logo || "", site_favicon: settings.site_favicon || "",
+        site_url: settings.site_url || "", site_logo: settings.site_logo || "", site_favicon: settings.site_favicon || "", trustpilot_url: settings.trustpilot_url || "",
         email_notifications_conversions: settings.email_notifications_conversions === "true",
         email_weekly_analytics: settings.email_weekly_analytics === "true",
         email_blog_comments: settings.email_blog_comments === "true",

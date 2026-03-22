@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { Upload, Download, ArrowRight, Zap, Shield, Layers, Image, FileCode, X, Check, Trash2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useCreateConversion, useTrackEvent } from "@/hooks/use-cms-data";
+import { useCreateConversion, useTrackEvent, useSiteSettings } from "@/hooks/use-cms-data";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";

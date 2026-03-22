@@ -19,7 +19,7 @@ export default function SettingsPage() {
 
   const [form, setForm] = useState({
     site_name: "", site_description: "", site_url: "",
-    site_logo: "", site_favicon: "",
+    site_logo: "", site_favicon: "", trustpilot_url: "",
     email_notifications_conversions: true, email_weekly_analytics: true,
     email_blog_comments: false, email_security_alerts: true,
     two_factor_auth: false, rate_limiting: true, max_upload_size_mb: "10",

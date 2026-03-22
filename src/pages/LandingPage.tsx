@@ -198,6 +198,7 @@ export default function LandingPage() {
             <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
           </nav>
           <div className="flex items-center gap-2 sm:gap-3">
+            <a href="/blog" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline">Blog</a>
             <a href="/about" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline">About</a>
             <button
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -599,6 +600,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8">
               <div className="flex items-center gap-5 text-sm text-muted-foreground">
                 <a href="/about" className="hover:text-foreground transition-colors">About</a>
+                <a href="/blog" className="hover:text-foreground transition-colors">Blog</a>
                 <a href="/contact" className="hover:text-foreground transition-colors">Contact</a>
                 <a href="/privacy" className="hover:text-foreground transition-colors">Privacy</a>
               </div>

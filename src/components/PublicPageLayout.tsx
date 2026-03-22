@@ -29,6 +29,7 @@ export default function PublicPageLayout({ children }: { children: React.ReactNo
           </button>
           <nav className="flex items-center gap-4 sm:gap-6 text-sm text-muted-foreground">
             <a href="/" className="hover:text-foreground transition-colors">Home</a>
+            <a href="/blog" className="hover:text-foreground transition-colors">Blog</a>
             <a href="/about" className="hover:text-foreground transition-colors">About</a>
             <a href="/contact" className="hover:text-foreground transition-colors">Contact</a>
             <button
@@ -58,6 +59,7 @@ export default function PublicPageLayout({ children }: { children: React.ReactNo
           </div>
           <div className="flex items-center gap-4 text-xs">
             <a href="/about" className="hover:text-foreground transition-colors">About</a>
+            <a href="/blog" className="hover:text-foreground transition-colors">Blog</a>
             <a href="/contact" className="hover:text-foreground transition-colors">Contact</a>
             <a href="/privacy" className="hover:text-foreground transition-colors">Privacy</a>
           </div>

@@ -170,7 +170,10 @@ export function useUpdateSiteSetting() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ key, value }: { key: string; value: string }) => {
-      const { error } = await supabase.from("site_settings").update({ value }).eq("key", key);
+      const { error } = await supabase.from("site_settings").upsert(
+        { key, value, updated_at: new Date().toISOString() },
+        { onConflict: "key" }
+      );
       if (error) throw error;
     },
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["site_settings"] }); },

@@ -134,6 +134,21 @@ export default function SettingsPage() {
           </div>
         </div>
 
+        {/* Integrations */}
+        <div className="rounded-xl border bg-card p-5 sm:p-6 shadow-sm animate-fade-up stagger-2">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-9 w-9 rounded-lg bg-[#00B67A]/10 flex items-center justify-center"><ExternalLink className="h-4 w-4 text-[#00B67A]" /></div>
+            <h2 className="font-semibold text-lg">Trustpilot</h2>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <Label>Trustpilot Profile URL</Label>
+              <Input value={form.trustpilot_url} onChange={(e) => setForm(f => ({ ...f, trustpilot_url: e.target.value }))} className="mt-1.5" placeholder="https://www.trustpilot.com/review/yoursite.com" />
+              <p className="text-xs text-muted-foreground mt-1">Enter your Trustpilot page URL to show a review link on the homepage. Leave empty to hide.</p>
+            </div>
+          </div>
+        </div>
+
         {/* Notifications */}
         <div className="rounded-xl border bg-card p-5 sm:p-6 shadow-sm animate-fade-up stagger-3">
           <div className="flex items-center gap-3 mb-6">

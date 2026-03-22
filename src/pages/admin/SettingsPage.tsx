@@ -1,4 +1,4 @@
-import { Save, Globe, Bell, Shield, ImageIcon, Upload } from "lucide-react";
+import { Save, Globe, Bell, Shield, ImageIcon, Upload, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -19,7 +19,7 @@ export default function SettingsPage() {
 
   const [form, setForm] = useState({
     site_name: "", site_description: "", site_url: "",
-    site_logo: "", site_favicon: "",
+    site_logo: "", site_favicon: "", trustpilot_url: "",
     email_notifications_conversions: true, email_weekly_analytics: true,
     email_blog_comments: false, email_security_alerts: true,
     two_factor_auth: false, rate_limiting: true, max_upload_size_mb: "10",
@@ -29,7 +29,7 @@ export default function SettingsPage() {
     if (settings) {
       setForm({
         site_name: settings.site_name || "", site_description: settings.site_description || "",
-        site_url: settings.site_url || "", site_logo: settings.site_logo || "", site_favicon: settings.site_favicon || "",
+        site_url: settings.site_url || "", site_logo: settings.site_logo || "", site_favicon: settings.site_favicon || "", trustpilot_url: settings.trustpilot_url || "",
         email_notifications_conversions: settings.email_notifications_conversions === "true",
         email_weekly_analytics: settings.email_weekly_analytics === "true",
         email_blog_comments: settings.email_blog_comments === "true",
@@ -56,7 +56,7 @@ export default function SettingsPage() {
   const handleSave = () => {
     const entries: [string, string][] = [
       ["site_name", form.site_name], ["site_description", form.site_description], ["site_url", form.site_url],
-      ["site_logo", form.site_logo], ["site_favicon", form.site_favicon],
+      ["site_logo", form.site_logo], ["site_favicon", form.site_favicon], ["trustpilot_url", form.trustpilot_url],
       ["email_notifications_conversions", String(form.email_notifications_conversions)],
       ["email_weekly_analytics", String(form.email_weekly_analytics)],
       ["email_blog_comments", String(form.email_blog_comments)],
@@ -131,6 +131,21 @@ export default function SettingsPage() {
             <div><Label>Site Name</Label><Input value={form.site_name} onChange={(e) => setForm(f => ({ ...f, site_name: e.target.value }))} className="mt-1.5" /></div>
             <div><Label>Site Description</Label><Textarea value={form.site_description} onChange={(e) => setForm(f => ({ ...f, site_description: e.target.value }))} className="mt-1.5" rows={3} /></div>
             <div><Label>Site URL</Label><Input value={form.site_url} onChange={(e) => setForm(f => ({ ...f, site_url: e.target.value }))} className="mt-1.5" /></div>
+          </div>
+        </div>
+
+        {/* Integrations */}
+        <div className="rounded-xl border bg-card p-5 sm:p-6 shadow-sm animate-fade-up stagger-2">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-9 w-9 rounded-lg bg-[#00B67A]/10 flex items-center justify-center"><ExternalLink className="h-4 w-4 text-[#00B67A]" /></div>
+            <h2 className="font-semibold text-lg">Trustpilot</h2>
+          </div>
+          <div className="space-y-4">
+            <div>
+              <Label>Trustpilot Profile URL</Label>
+              <Input value={form.trustpilot_url} onChange={(e) => setForm(f => ({ ...f, trustpilot_url: e.target.value }))} className="mt-1.5" placeholder="https://www.trustpilot.com/review/yoursite.com" />
+              <p className="text-xs text-muted-foreground mt-1">Enter your Trustpilot page URL to show a review link on the homepage. Leave empty to hide.</p>
+            </div>
           </div>
         </div>
 

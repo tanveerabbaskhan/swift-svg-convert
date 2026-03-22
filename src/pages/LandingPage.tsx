@@ -198,14 +198,15 @@ export default function LandingPage() {
           <div className="mx-auto max-w-3xl text-center animate-fade-up">
             <div className="mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-full border bg-card px-3 sm:px-4 py-1.5 text-xs sm:text-sm text-muted-foreground shadow-sm">
               <Zap className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-accent" />
-              Free, fast & private — no uploads to server
+              Free. No signup. No watermark. No file size limit.
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.08]">
-              Convert <span className="text-gradient">PNG to SVG</span> in seconds
+              Free <span className="text-gradient">PNG to SVG</span> Converter — Convert Raster Images to Scalable Vector Graphics Online
             </h1>
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-muted-foreground max-w-xl mx-auto leading-relaxed px-2">
-              Transform raster images into scalable vectors. Bulk convert, real-time preview, 100% browser-based.
+            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
+              Upload your PNG. Get a real SVG — not a Base64 wrapper. Most free converters embed your PNG inside an SVG file without any actual vectorization. Ours performs true image tracing — converting your raster pixels into clean, scalable SVG paths that resize without quality loss.
             </p>
+            <p className="mt-3 text-sm text-muted-foreground font-medium">Works in your browser. Completely private.</p>
             {/* Live counter */}
             <div className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground">
               <div className="h-2 w-2 rounded-full bg-success animate-pulse" />

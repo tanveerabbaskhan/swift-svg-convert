@@ -362,35 +362,34 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Reviews */}
-      <section id="reviews" className="py-12 sm:py-20">
-        <div className="container px-4 sm:px-6">
-          <div className="text-center mb-10 sm:mb-16 animate-fade-up">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">What users say</h2>
-            <div className="flex items-center justify-center gap-1 mt-3">
-              {[1,2,3,4,5].map(i => <Star key={i} className="h-5 w-5 fill-warning text-warning" />)}
-              <span className="ml-2 text-sm text-muted-foreground">4.9 out of 5</span>
+      {/* Trustpilot Reviews */}
+      {trustpilotUrl && (
+        <section id="reviews" className="py-12 sm:py-20">
+          <div className="container max-w-3xl px-4 sm:px-6 text-center animate-fade-up">
+            <div className="rounded-2xl border bg-card p-8 sm:p-12 shadow-sm">
+              <div className="mb-5">
+                <svg viewBox="0 0 126 31" className="h-8 mx-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M21.2 0H4.7C2.1 0 0 2.1 0 4.7v21.5c0 2.6 2.1 4.7 4.7 4.7h16.5c2.6 0 4.7-2.1 4.7-4.7V4.7C25.9 2.1 23.8 0 21.2 0z" fill="#00B67A"/>
+                  <path d="M13 21.5l-3.7 1.1 1-3.7L6 14.2h4.3L13 8l2.7 6.2h4.3l-4.3 4.7 1 3.7L13 21.5z" fill="#fff"/>
+                  <text x="32" y="22" fontFamily="system-ui" fontSize="18" fontWeight="700" fill="currentColor">Trustpilot</text>
+                </svg>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">See what our users think</h2>
+              <p className="text-sm sm:text-base text-muted-foreground mb-6 max-w-md mx-auto">
+                Read verified reviews from real users on Trustpilot.
+              </p>
+              <a
+                href={trustpilotUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#00B67A] px-6 py-3 text-sm font-semibold text-white hover:bg-[#00A06A] transition-colors shadow-md shadow-[#00B67A]/20"
+              >
+                Read Reviews on Trustpilot <ExternalLink className="h-4 w-4" />
+              </a>
             </div>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
-            {reviews.map((r, i) => (
-              <div key={r.name} className={`rounded-2xl border bg-card p-5 sm:p-6 shadow-sm animate-fade-up stagger-${(i % 4) + 1}`}>
-                <div className="flex items-center gap-1 mb-3">
-                  {Array.from({ length: r.rating }).map((_, j) => <Star key={j} className="h-3.5 w-3.5 fill-warning text-warning" />)}
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4">"{r.text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-full gradient-primary flex items-center justify-center text-xs font-bold text-primary-foreground">{r.name[0]}</div>
-                  <div>
-                    <p className="text-sm font-medium">{r.name}</p>
-                    <p className="text-xs text-muted-foreground">{r.role}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* FAQ */}
       <section id="faq" className="py-12 sm:py-20 bg-muted/30">

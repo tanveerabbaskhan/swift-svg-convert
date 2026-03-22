@@ -18,24 +18,35 @@ type ConversionFile = {
 };
 
 const features = [
-  { icon: Zap, title: "Lightning Fast", desc: "Convert your PNG files to SVG format in seconds with our optimized engine." },
-  { icon: Shield, title: "Secure & Private", desc: "Files are processed locally in your browser. Nothing is uploaded to any server." },
-  { icon: Layers, title: "High Quality", desc: "Advanced tracing algorithms preserve detail and produce clean vector paths." },
+  { icon: Zap, title: "True Vectorization — Not Base64", desc: "We trace your image pixel-by-pixel and rebuild it as real SVG paths. Not a wrapper. Not an embed. A genuine vector file." },
+  { icon: Layers, title: "Colors Preserved — Full Color Output", desc: "Keep every color from your original PNG. Our color tracing mode rebuilds each color region as a separate vector path." },
+  { icon: Image, title: "Transparent Backgrounds Supported", desc: "Upload a PNG with no background. Get an SVG with no background. No white fill. No unexpected background color." },
+  { icon: Shield, title: "No Signup Required — Ever", desc: "Open the page. Upload your file. Download your SVG. No account. No email. No password. No credit card." },
+  { icon: FileCode, title: "No Watermark on Output", desc: "Your converted SVG file is clean. No branding. No overlay. No locked quality behind a paywall." },
+  { icon: Shield, title: "Runs Entirely in Your Browser", desc: "Your PNG never leaves your device. Processing happens locally — no file upload to a server. Completely private." },
+  { icon: Layers, title: "Works for Logos, Icons, and Cricut Files", desc: "Flat images with clear edges convert perfectly. Logos, icons, clip art, and Cricut cut files all supported." },
+  { icon: Zap, title: "Black and White + Full Color Modes", desc: "Monochrome images use our black and white preset for the cleanest edges. Color images use full color tracing." },
 ];
 
 const steps = [
-  { num: "01", title: "Upload PNG", desc: "Drag & drop or select one or multiple PNG files." },
-  { num: "02", title: "Auto Convert", desc: "Files are processed instantly with a real-time preview." },
-  { num: "03", title: "Download SVG", desc: "Download individual files or all at once." },
+  { num: "01", title: "Upload Your PNG", desc: "Click the upload area or drag and drop your PNG file directly onto the converter. Supports PNG files of any size. No file size limits." },
+  { num: "02", title: "Choose Your Settings", desc: "Select Full Color mode to preserve all colors from your original image. Select Black and White mode for logos, icons, and line art with the cleanest edge tracing." },
+  { num: "03", title: "Download Your SVG", desc: "Click Convert. Your PNG is traced into real SVG vector paths — not embedded as Base64. Download your clean, scalable SVG file instantly. No watermark." },
 ];
 
 const faqs = [
-  { q: "Is this tool really free?", a: "Yes, PNGTOSVG is completely free with no hidden fees, no sign-up required, and no usage limits." },
-  { q: "Are my files uploaded to a server?", a: "No. All conversion happens directly in your browser using HTML5 Canvas. Your files never leave your device, ensuring complete privacy." },
-  { q: "What is the maximum file size?", a: "We support PNG files up to 10MB each. For bulk conversions, you can upload multiple files at once." },
-  { q: "Can I convert multiple files at once?", a: "Yes! Our bulk conversion feature lets you drag & drop or select multiple PNG files and convert them all simultaneously." },
-  { q: "What browsers are supported?", a: "PNGTOSVG works on all modern browsers including Chrome, Firefox, Safari, and Edge on both desktop and mobile devices." },
-  { q: "How does the conversion work?", a: "We use color quantization and optimized SVG path generation to trace your PNG image into scalable vector graphics while preserving as much detail as possible." },
+  { q: "What is a PNG to SVG converter?", a: "A PNG to SVG converter transforms raster images made of pixels into scalable vector graphics built from mathematical paths. True converters rebuild images as vector paths, while fake ones simply embed the PNG inside an SVG file." },
+  { q: "How do I convert PNG to SVG for free?", a: "Upload your PNG, choose Full Color or Black and White mode, click Convert, and download your SVG instantly. No signup, no watermark, and no payment required." },
+  { q: "Why does my SVG look blurry or pixelated after conversion?", a: "This usually means the file is a Base64-embedded PNG inside an SVG. A real SVG created through vectorization will stay sharp at any size." },
+  { q: "How do I keep the colors when converting PNG to SVG?", a: "Use Full Color mode. This traces each color region separately and preserves the original color details." },
+  { q: "Is it possible to convert a raster image to a real vector automatically?", a: "Yes, especially for logos, icons, and simple graphics. Complex images with gradients may require manual cleanup." },
+  { q: "What types of PNG files convert best to SVG?", a: "Images with clear edges, flat colors, and high contrast — like logos, icons, and line art — produce the best results." },
+  { q: "Why is my converted SVG file so large?", a: "Complex images create more vector paths. Use an optimizer or simplify the original PNG before converting." },
+  { q: "Why does my SVG have a white background?", a: "This happens when transparency isn't preserved. Enable the transparency option before converting." },
+  { q: "Can I convert PNG to SVG without losing quality?", a: "Yes. Once converted into vector paths, SVG files scale infinitely without losing quality." },
+  { q: "What is the difference between PNG and SVG?", a: "PNG is pixel-based and loses quality when scaled. SVG is vector-based and remains sharp at any size." },
+  { q: "Do I need to create an account to use this converter?", a: "No. You can upload, convert, and download files without signing up." },
+  { q: "How does image tracing work in SVG conversion?", a: "Image tracing detects edges and color regions in a PNG and converts them into mathematical curves and vector paths, creating a scalable version of the image." },
 ];
 
 function convertPng(preview: string, onProgress: (p: number) => void): Promise<string> {

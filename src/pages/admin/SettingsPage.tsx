@@ -56,7 +56,7 @@ export default function SettingsPage() {
   const handleSave = () => {
     const entries: [string, string][] = [
       ["site_name", form.site_name], ["site_description", form.site_description], ["site_url", form.site_url],
-      ["site_logo", form.site_logo], ["site_favicon", form.site_favicon],
+      ["site_logo", form.site_logo], ["site_favicon", form.site_favicon], ["trustpilot_url", form.trustpilot_url],
       ["email_notifications_conversions", String(form.email_notifications_conversions)],
       ["email_weekly_analytics", String(form.email_weekly_analytics)],
       ["email_blog_comments", String(form.email_blog_comments)],

@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import { Upload, Download, ArrowRight, Zap, Shield, Layers, Image, FileCode, CheckCircle2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useCreateConversion, useTrackEvent } from "@/hooks/use-cms-data";
 import { useNavigate } from "react-router-dom";
 
 const features = [

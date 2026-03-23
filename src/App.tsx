@@ -11,6 +11,7 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import PrivacyPage from "./pages/PrivacyPage";
 import BlogListingPage from "./pages/BlogListingPage";
+import BlogPostPage from "./pages/BlogPostPage";
 import AdminLayout from "./components/AdminLayout";
 import LoginPage from "./pages/admin/LoginPage";
 import DashboardPage from "./pages/admin/DashboardPage";
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/blog" element={<BlogListingPage />} />
+              <Route path="/blog/:slug" element={<BlogPostPage />} />
               <Route path="/admin/login" element={<LoginPage />} />
               <Route path="/admin" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
                 <Route index element={<DashboardPage />} />

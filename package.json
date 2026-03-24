@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/generate-sitemap.mjs && vite build",
+    "build": "node scripts/generate-blog-static-files.mjs && vite build",
     "build:dev": "vite build --mode development",
+    "generate:blog-static": "node scripts/generate-blog-static-files.mjs",
+    "generate:sitemap": "node scripts/generate-sitemap.mjs",
+    "verify:seo": "node scripts/verify-seo-setup.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",

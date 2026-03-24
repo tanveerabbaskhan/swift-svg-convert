@@ -1,8 +1,10 @@
 User-agent: Googlebot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Bingbot
 Allow: /
+Crawl-delay: 1
 
 User-agent: Twitterbot
 Allow: /
@@ -14,5 +16,10 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /admin/login
+Disallow: /*.json$
+Crawl-delay: 1
+
+# Allow blog post HTML files
+Allow: /blog/*.html
 
 Sitemap: https://pngtosvgconverter.com/sitemap.xml

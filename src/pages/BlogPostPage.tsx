@@ -1,6 +1,6 @@
 import PublicPageLayout from "@/components/PublicPageLayout";
 import { useBlogPosts } from "@/hooks/use-cms-data";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Loader2, Calendar, ArrowLeft, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
@@ -9,9 +9,22 @@ import "@/styles/blog-content.css";
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const { data: posts, isLoading } = useBlogPosts();
+  const { data: posts, isLoading, error } = useBlogPosts();
+
+  // Debug logging
+  console.log('BlogPostPage - slug:', slug);
+  console.log('BlogPostPage - posts:', posts);
+  console.log('BlogPostPage - isLoading:', isLoading);
+  console.log('BlogPostPage - error:', error);
+
+  // Additional debug for slugs
+  if (posts && posts.length > 0) {
+    console.log('Available slugs:', posts.map(p => ({ slug: p.slug, title: p.title, status: p.status })));
+  }
 
   const post = posts?.find((p: any) => p.slug === slug && p.status === "published");
+
+  console.log('BlogPostPage - found post:', post);
 
   // Debug: Log the post data to see what meta fields are available
   useEffect(() => {
@@ -234,6 +247,20 @@ export default function BlogPostPage() {
     );
   }
 
+  if (error) {
+    return (
+      <PublicPageLayout>
+        <div className="container max-w-3xl py-20 px-4 text-center animate-fade-up">
+          <h1 className="text-3xl font-bold mb-3">Error Loading Post</h1>
+          <p className="text-muted-foreground mb-6">There was an error loading the blog post. Please try again later.</p>
+          <Button onClick={() => navigate("/blog")} variant="outline">
+            <ArrowLeft className="h-4 w-4 mr-2" /> Back to Blog
+          </Button>
+        </div>
+      </PublicPageLayout>
+    );
+  }
+
   if (!post) {
     return (
       <PublicPageLayout>
@@ -256,9 +283,9 @@ export default function BlogPostPage() {
           <div className="container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
             {/* Breadcrumb */}
             <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6 sm:mb-8">
-              <a href="/" className="hover:text-foreground transition-colors font-medium">Home</a>
+              <Link to="/" className="hover:text-foreground transition-colors font-medium">Home</Link>
               <span className="text-border">/</span>
-              <a href="/blog" className="hover:text-foreground transition-colors font-medium">Blog</a>
+              <Link to="/blog" className="hover:text-foreground transition-colors font-medium">Blog</Link>
               <span className="text-border">/</span>
               <span className="text-foreground font-medium truncate max-w-[150px] sm:max-w-[200px] md:max-w-none">{post.title}</span>
             </nav>

@@ -1,6 +1,7 @@
 import PublicPageLayout from "@/components/PublicPageLayout";
 import { useBlogPosts } from "@/hooks/use-cms-data";
 import { Loader2, Calendar, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function BlogListingPage() {
   const { data: posts, isLoading } = useBlogPosts();
@@ -36,17 +37,17 @@ export default function BlogListingPage() {
                   )}
                 </div>
                 <h2 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
-                  <a href={`/blog/${post.slug}`}>{post.title}</a>
+                  <Link to={`/blog/${post.slug}`}>{post.title}</Link>
                 </h2>
                 {post.excerpt && (
                   <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{post.excerpt}</p>
                 )}
-                <a
-                  href={`/blog/${post.slug}`}
+                <Link
+                  to={`/blog/${post.slug}`}
                   className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
                 >
                   Read more <ArrowRight className="h-3.5 w-3.5" />
-                </a>
+                </Link>
               </article>
             ))}
           </div>

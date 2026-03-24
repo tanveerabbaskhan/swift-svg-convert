@@ -68,15 +68,31 @@ export default function BlogPostPage() {
   };
 
   const updateCanonicalTag = (href: string) => {
-    // Find existing canonical tag or create new one
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
-      document.head.appendChild(canonical);
-    }
+    // Remove ALL existing canonical tags first
+    document.querySelectorAll('link[rel="canonical"]').forEach(tag => tag.remove());
+    
+    // Create new canonical tag
+    const canonical = document.createElement('link');
+    canonical.setAttribute('rel', 'canonical');
     canonical.setAttribute('href', href);
-    console.log('Updated canonical URL to:', href);
+    
+    // Add to head immediately
+    document.head.appendChild(canonical);
+    
+    // Force update by setting id and updating
+    canonical.id = 'blog-canonical';
+    
+    console.log('FORCE Updated canonical URL to:', href);
+    
+    // Verify it was set
+    setTimeout(() => {
+      const checkCanonical = document.querySelector('link[rel="canonical"]');
+      if (checkCanonical) {
+        console.log('Canonical verification:', checkCanonical.getAttribute('href'));
+      } else {
+        console.warn('Canonical not found after update!');
+      }
+    }, 50);
   };
 
   // Set document title and meta tags when post loads
@@ -97,35 +113,41 @@ export default function BlogPostPage() {
         excerpt: (finalPost as any).excerpt
       });
       
-      // Simple, clean SEO update
-      const updateSEO = () => {
-        // Update document title
-        document.title = title;
-        
-        // Update meta tags
-        updateMetaTag('description', description);
-        updateMetaTag('og:title', title);
-        updateMetaTag('og:description', description);
-        updateMetaTag('og:url', url);
-        updateMetaTag('og:type', 'article');
-        updateMetaTag('og:site_name', 'PNGTOSVG');
-        updateMetaTag('og:image', image || 'https://pngtosvgconverter.com/og-image.jpg');
-        updateMetaTag('twitter:card', 'summary_large_image');
-        updateMetaTag('twitter:title', title);
-        updateMetaTag('twitter:description', description);
-        updateMetaTag('twitter:image', image || 'https://pngtosvgconverter.com/og-image.jpg');
-        
-        // Update canonical URL to the blog post URL
-        updateCanonicalTag(url);
-        
-        // Set article structured data
-        updateStructuredData(title, description, url, finalPost.created_at, image);
-        
-        console.log('Blog post SEO updated successfully');
+      // IMMEDIATE SEO update - run synchronously
+      document.title = title;
+      
+      // Update meta tags immediately
+      updateMetaTag('description', description);
+      updateMetaTag('og:title', title);
+      updateMetaTag('og:description', description);
+      updateMetaTag('og:url', url);
+      updateMetaTag('og:type', 'article');
+      updateMetaTag('og:site_name', 'PNGTOSVG');
+      updateMetaTag('og:image', image || 'https://pngtosvgconverter.com/og-image.jpg');
+      updateMetaTag('twitter:card', 'summary_large_image');
+      updateMetaTag('twitter:title', title);
+      updateMetaTag('twitter:description', description);
+      updateMetaTag('twitter:image', image || 'https://pngtosvgconverter.com/og-image.jpg');
+      
+      // CRITICAL: Update canonical URL immediately and multiple times
+      updateCanonicalTag(url);
+      
+      // Set article structured data
+      updateStructuredData(title, description, url, finalPost.created_at, image);
+      
+      // Multiple attempts to ensure canonical URL sticks
+      const timeouts = [
+        setTimeout(() => updateCanonicalTag(url), 100),
+        setTimeout(() => updateCanonicalTag(url), 500),
+        setTimeout(() => updateCanonicalTag(url), 1000),
+        setTimeout(() => updateCanonicalTag(url), 2000)
+      ];
+      
+      console.log('Blog post SEO updated immediately');
+      
+      return () => {
+        timeouts.forEach(clearTimeout);
       };
-
-      // Simple single update with requestAnimationFrame
-      requestAnimationFrame(updateSEO);
     }
   }, [finalPost]);
 

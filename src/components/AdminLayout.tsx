@@ -1,9 +1,9 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { 
   LayoutDashboard, FileText, PenTool, FolderOpen, Search, BarChart3, Settings, 
-  LogOut, FileCode, ChevronLeft, Menu 
+  LogOut, FileCode, ChevronLeft, Menu, X 
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { useSiteSettings } from "@/hooks/use-cms-data";
 import { useAuth } from "@/components/AuthProvider";
@@ -20,16 +20,71 @@ const navItems = [
 
 export default function AdminLayout() {
   const [collapsed, setCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
   const { data: settings } = useSiteSettings();
   const siteName = settings?.site_name || "PNGTOSVG";
   const siteLogo = settings?.site_logo || "";
 
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden'; // Prevent background scroll
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileMenuOpen]);
+
   return (
     <div className="flex min-h-screen bg-background">
+      {/* Mobile Menu Button */}
+      <div className="lg:hidden fixed top-4 left-4 z-50">
+        <Button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          size="sm"
+          className="h-10 w-10 p-0 shadow-lg"
+        >
+          {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+        </Button>
+      </div>
+
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden fixed inset-0 z-40 bg-black/50" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
+
       {/* Sidebar */}
-      <aside className={`${collapsed ? "w-16" : "w-64"} flex-shrink-0 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col transition-all duration-300`}>
+      <aside 
+        className={`
+          ${collapsed ? "w-16" : "w-64"} 
+          flex-shrink-0 bg-sidebar text-sidebar-foreground border-r border-sidebar-border flex flex-col transition-all duration-300
+          fixed lg:relative h-full lg:h-auto z-50
+          ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        `}
+        ref={mobileMenuRef}
+      >
         <div className={`h-16 flex items-center ${collapsed ? "justify-center" : "px-5"} border-b border-sidebar-border`}>
           {!collapsed && (
             <button onClick={() => navigate("/")} className="flex items-center gap-2.5 font-bold text-lg text-sidebar-accent-foreground">
@@ -56,6 +111,7 @@ export default function AdminLayout() {
               key={item.to}
               to={item.to}
               end={item.end}
+              onClick={() => setIsMobileMenuOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors ${
                   isActive
@@ -88,7 +144,7 @@ export default function AdminLayout() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto lg:pt-0 pt-16">
         <Outlet />
       </main>
     </div>

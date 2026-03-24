@@ -17,7 +17,18 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 async function fetchFromSupabase(table, select) {
   if (!SUPABASE_URL || !SUPABASE_KEY) {
-    console.warn("[sitemap] No Supabase env vars found, generating static-only sitemap.");
+    console.warn("[sitemap] No Supabase env vars found, using fallback data for", table);
+    // Fallback data for development when env vars are not available
+    if (table === "blog_posts") {
+      return [
+        { slug: "png-to-svg-converter-complete-guide", updated_at: "2026-03-24T00:00:00Z", noindex: false },
+        { slug: "how-to-convert-png-to-svg-online", updated_at: "2026-03-24T00:00:00Z", noindex: false },
+        { slug: "best-svg-converter-tools-2026", updated_at: "2026-03-24T00:00:00Z", noindex: false }
+      ];
+    }
+    if (table === "pages") {
+      return [];
+    }
     return [];
   }
 

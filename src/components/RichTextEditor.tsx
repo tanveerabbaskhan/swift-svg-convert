@@ -185,9 +185,9 @@ export default function RichTextEditor({ value, onChange, placeholder = "Start w
           outline: none;
         }
         .ProseMirror > * + * { margin-top: 0.75rem; }
-        .ProseMirror h1 { font-size: 1.875rem; font-weight: 700; line-height: 1.2; margin-top: 1.5rem; margin-bottom: 0.5rem; }
-        .ProseMirror h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; margin-top: 1.25rem; margin-bottom: 0.5rem; }
-        .ProseMirror h3 { font-size: 1.25rem; font-weight: 600; line-height: 1.4; margin-top: 1rem; margin-bottom: 0.5rem; }
+        .ProseMirror h1 { font-size: 1.875rem; font-weight: 700; line-height: 1.2; margin-top: 1.5rem; margin-bottom: 0.5rem; color: hsl(var(--foreground)); }
+        .ProseMirror h2 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; margin-top: 1.25rem; margin-bottom: 0.5rem; color: hsl(var(--foreground)); }
+        .ProseMirror h3 { font-size: 1.25rem; font-weight: 600; line-height: 1.4; margin-top: 1rem; margin-bottom: 0.5rem; color: hsl(var(--foreground)); }
         .ProseMirror p { line-height: 1.7; }
         .ProseMirror ul { list-style-type: disc; padding-left: 1.5rem; }
         .ProseMirror ol { list-style-type: decimal; padding-left: 1.5rem; }

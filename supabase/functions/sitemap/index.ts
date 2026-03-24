@@ -19,9 +19,11 @@ Deno.serve(async (req) => {
   const { data: pages } = await supabase.from("pages").select("slug, updated_at, noindex").eq("status", "published");
   const { data: posts } = await supabase.from("blog_posts").select("slug, updated_at, noindex").eq("status", "published");
 
-  let urls = `  <url><loc>${baseUrl}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>\n`;
-  urls += `  <url><loc>${baseUrl}/about</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>\n`;
-  urls += `  <url><loc>${baseUrl}/contact</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>\n`;
+  const today = new Date().toISOString().split("T")[0];
+  let urls = `  <url><loc>${baseUrl}/</loc><lastmod>${today}</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>\n`;
+  urls += `  <url><loc>${baseUrl}/blog</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>\n`;
+  urls += `  <url><loc>${baseUrl}/about</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>\n`;
+  urls += `  <url><loc>${baseUrl}/contact</loc><lastmod>${today}</lastmod><changefreq>monthly</changefreq><priority>0.5</priority></url>\n`;
 
   pages?.filter(p => !p.noindex).forEach(p => {
     urls += `  <url><loc>${baseUrl}${p.slug}</loc><lastmod>${p.updated_at.split("T")[0]}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>\n`;

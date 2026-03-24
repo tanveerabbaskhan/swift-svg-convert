@@ -9,6 +9,10 @@
       "destination": "/index.html" 
     },
     { 
+      "source": "/blog", 
+      "destination": "/index.html" 
+    },
+    { 
       "source": "/((?!assets|blog|sitemap\\.xml|robots\\.txt|favicon\\.ico).*)", 
       "destination": "/index.html" 
     }

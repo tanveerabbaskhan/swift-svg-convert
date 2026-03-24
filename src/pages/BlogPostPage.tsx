@@ -4,6 +4,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Loader2, Calendar, ArrowLeft, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import "@/styles/blog-content.css";
 
 export default function BlogPostPage() {
@@ -26,40 +27,51 @@ export default function BlogPostPage() {
 
   console.log('BlogPostPage - found post:', post);
 
+  // Fallback: try to find post by slug regardless of status
+  const anyPost = posts?.find((p: any) => p.slug === slug);
+  console.log('BlogPostPage - found any post (including draft):', anyPost);
+
+  // If no post found with exact match, try case-insensitive match
+  const caseInsensitivePost = posts?.find((p: any) => p.slug?.toLowerCase() === slug?.toLowerCase());
+  console.log('BlogPostPage - case-insensitive match:', caseInsensitivePost);
+
+  // Use the best match
+  const finalPost = post || anyPost || caseInsensitivePost;
+
   // Debug: Log the post data to see what meta fields are available
   useEffect(() => {
-    if (post) {
+    if (finalPost) {
       console.log('=== BLOG POST DEBUG ===');
-      console.log('Full post object:', post);
-      console.log('Post keys:', Object.keys(post));
-      console.log('Meta title:', (post as any).meta_title);
-      console.log('Meta description:', (post as any).meta_description);
-      console.log('Title:', post.title);
-      console.log('Excerpt:', (post as any).excerpt);
-      console.log('Slug:', post.slug);
-      console.log('Created at:', post.created_at);
+      console.log('Full post object:', finalPost);
+      console.log('Post keys:', Object.keys(finalPost));
+      console.log('Meta title:', (finalPost as any).meta_title);
+      console.log('Meta description:', (finalPost as any).meta_description);
+      console.log('Title:', finalPost.title);
+      console.log('Excerpt:', (finalPost as any).excerpt);
+      console.log('Slug:', finalPost.slug);
+      console.log('Created at:', finalPost.created_at);
       console.log('========================');
     }
-  }, [post]);
+  }, [finalPost]);
 
   // Set document title and meta tags when post loads
   useEffect(() => {
-    if (post) {
+    if (finalPost) {
       // Use requestAnimationFrame to ensure this runs after all other head updates
       const updateSEO = () => {
-        const title = (post as any).meta_title || `${post.title} — PNGTOSVG`;
-        const description = (post as any).meta_description || (post as any).excerpt || "Convert PNG images to SVG vector graphics instantly. Free, fast, and secure.";
-        const url = `https://pngtosvgconverter.com/blog/${post.slug}`;
-        const image = (post as any).featured_image;
+        const title = (finalPost as any).meta_title || `${finalPost.title} — PNGTOSVG`;
+        const description = (finalPost as any).meta_description || (finalPost as any).excerpt || "Convert PNG images to SVG vector graphics instantly. Free, fast, and secure.";
+        const url = `https://pngtosvgconverter.com/blog/${finalPost.slug}`;
+        const image = (finalPost as any).featured_image;
         
         console.log('Updating blog post SEO:', { 
           title, 
           description, 
           url,
-          metaTitle: (post as any).meta_title,
-          metaDescription: (post as any).meta_description,
-          postTitle: post.title,
-          excerpt: (post as any).excerpt
+          metaTitle: (finalPost as any).meta_title,
+          metaDescription: (finalPost as any).meta_description,
+          postTitle: finalPost.title,
+          excerpt: (finalPost as any).excerpt
         });
         
         // Update document title
@@ -82,7 +94,7 @@ export default function BlogPostPage() {
         updateCanonicalTag(url);
         
         // Also set article structured data
-        updateStructuredData(title, description, url, post.created_at, image);
+        updateStructuredData(title, description, url, finalPost.created_at, image);
         
         console.log('Blog post SEO updated successfully');
       };
@@ -101,7 +113,7 @@ export default function BlogPostPage() {
       document.title = "Free PNG to SVG Converter Online — No Signup, No Watermark";
       updateCanonicalTag('https://pngtosvgconverter.com/');
     };
-  }, [post]);
+  }, [finalPost]);
 
   // Helper functions to update meta tags
   const updateMetaTag = (name: string, content: string) => {
@@ -174,11 +186,11 @@ export default function BlogPostPage() {
   const [tableOfContents, setTableOfContents] = useState<Array<{id: string, text: string, level: number}>>([]);
 
   useEffect(() => {
-    if (post && (post as any).content) {
-      const toc = generateTableOfContents((post as any).content);
+    if (finalPost && (finalPost as any).content) {
+      const toc = generateTableOfContents((finalPost as any).content);
       setTableOfContents(toc);
     }
-  }, [post, (post as any).content]);
+  }, [finalPost, (finalPost as any).content]);
 
   // Apply heading IDs to the rendered content after mount
   useEffect(() => {
@@ -261,12 +273,19 @@ export default function BlogPostPage() {
     );
   }
 
-  if (!post) {
+  if (!finalPost) {
     return (
       <PublicPageLayout>
         <div className="container max-w-3xl py-20 px-4 text-center animate-fade-up">
           <h1 className="text-3xl font-bold mb-3">Post Not Found</h1>
-          <p className="text-muted-foreground mb-6">The blog post you're looking for doesn't exist or hasn't been published yet.</p>
+          <p className="text-muted-foreground mb-6">
+            The blog post "{slug}" doesn't exist or hasn't been published yet.
+            {posts && posts.length > 0 && (
+              <span className="block mt-2 text-sm">
+                Available posts: {posts.map(p => p.slug).join(', ')}
+              </span>
+            )}
+          </p>
           <Button onClick={() => navigate("/blog")} variant="outline">
             <ArrowLeft className="h-4 w-4 mr-2" /> Back to Blog
           </Button>
@@ -276,8 +295,9 @@ export default function BlogPostPage() {
   }
 
   return (
-    <PublicPageLayout>
-      <article className="min-h-screen bg-background">
+    <ErrorBoundary>
+      <PublicPageLayout>
+        <article className="min-h-screen bg-background">
         {/* Hero Section */}
         <div className="bg-gradient-to-b from-background via-muted/10 to-background border-b border-border">
           <div className="container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
@@ -287,16 +307,16 @@ export default function BlogPostPage() {
               <span className="text-border">/</span>
               <Link to="/blog" className="hover:text-foreground transition-colors font-medium">Blog</Link>
               <span className="text-border">/</span>
-              <span className="text-foreground font-medium truncate max-w-[150px] sm:max-w-[200px] md:max-w-none">{post.title}</span>
+              <span className="text-foreground font-medium truncate max-w-[150px] sm:max-w-[200px] md:max-w-none">{finalPost.title}</span>
             </nav>
 
             {/* Featured Image */}
-            {(post as any).featured_image && (
+            {(finalPost as any).featured_image && (
               <div className="mb-8 sm:mb-12 -mx-4 sm:mx-0">
                 <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-2xl">
                   <img
-                    src={(post as any).featured_image}
-                    alt={post.title}
+                    src={(finalPost as any).featured_image}
+                    alt={finalPost.title}
                     className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none"></div>
@@ -307,26 +327,26 @@ export default function BlogPostPage() {
             {/* Title Section */}
             <div className="text-center mb-8 sm:mb-12">
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight mb-6 sm:mb-8 leading-tight sm:leading-tight md:leading-tight text-foreground">
-                {post.title}
+                {finalPost.title}
               </h1>
               
               {/* Meta Information */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm sm:text-base text-muted-foreground">
                 <div className="flex items-center gap-2 bg-muted/50 px-3 py-2 rounded-full">
                   <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <time dateTime={post.created_at} className="font-medium">
-                    {new Date(post.created_at).toLocaleDateString("en-US", { 
+                  <time dateTime={finalPost.created_at} className="font-medium">
+                    {new Date(finalPost.created_at).toLocaleDateString("en-US", { 
                       year: "numeric", 
                       month: "long", 
                       day: "numeric" 
                     })}
                   </time>
                 </div>
-                {(post as any).categories?.name && (
+                {(finalPost as any).categories?.name && (
                   <div className="flex items-center gap-2 bg-primary/10 px-3 py-2 rounded-full">
                     <Tag className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     <span className="text-primary font-medium">
-                      {(post as any).categories.name}
+                      {(finalPost as any).categories.name}
                     </span>
                   </div>
                 )}
@@ -334,11 +354,11 @@ export default function BlogPostPage() {
             </div>
 
             {/* Excerpt */}
-            {(post as any).excerpt && (
+            {(finalPost as any).excerpt && (
               <div className="max-w-4xl mx-auto mb-8 sm:mb-12">
                 <div className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-l-4 border-primary rounded-r-xl p-6 sm:p-8">
                   <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed sm:leading-relaxed md:leading-relaxed text-center font-medium">
-                    {(post as any).excerpt}
+                    {(finalPost as any).excerpt}
                   </p>
                 </div>
               </div>
@@ -354,7 +374,7 @@ export default function BlogPostPage() {
               {/* Reading Time */}
               <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 px-4 py-2 rounded-lg w-fit">
                 <span>📖</span>
-                <span>{Math.ceil(((post as any).content?.length || 0) / 1000)} min read</span>
+                <span>{Math.ceil(((finalPost as any).content?.length || 0) / 1000)} min read</span>
               </div>
               
               {/* Table of Contents */}
@@ -404,7 +424,7 @@ export default function BlogPostPage() {
               <div
                 className="prose prose-sm sm:prose-base lg:prose-lg xl:prose-xl max-w-none text-foreground leading-relaxed sm:leading-relaxed lg:leading-relaxed"
                 style={{ textAlign: 'justify', textJustify: 'inter-word' }}
-                dangerouslySetInnerHTML={{ __html: post.content || "" }}
+                dangerouslySetInnerHTML={{ __html: finalPost.content || "" }}
               />
             </div>
 
@@ -416,8 +436,8 @@ export default function BlogPostPage() {
                     <span className="text-primary">📝</span>
                     <span>Published</span>
                   </div>
-                  <time dateTime={post.created_at} className="font-medium">
-                    {new Date(post.created_at).toLocaleDateString("en-US", { 
+                  <time dateTime={finalPost.created_at} className="font-medium">
+                    {new Date(finalPost.created_at).toLocaleDateString("en-US", { 
                       weekday: 'long',
                       year: "numeric", 
                       month: "long", 
@@ -470,6 +490,7 @@ export default function BlogPostPage() {
           </div>
         </div>
       </article>
-    </PublicPageLayout>
+      </PublicPageLayout>
+    </ErrorBoundary>
   );
 }

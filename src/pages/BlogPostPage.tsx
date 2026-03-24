@@ -112,6 +112,76 @@ export default function BlogPostPage() {
     canonical.setAttribute('href', href);
   };
 
+  // Helper function to generate table of contents from HTML content
+  const generateTableOfContents = (htmlContent: string) => {
+    if (!htmlContent) return [];
+    
+    // Create a temporary DOM element to parse HTML
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    
+    const headings = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    const tocItems = [];
+    
+    headings.forEach((heading, index) => {
+      const text = heading.textContent || '';
+      const level = parseInt(heading.tagName.charAt(1));
+      const id = `heading-${index}`;
+      
+      // Add ID to the heading for smooth scrolling
+      heading.id = id;
+      
+      tocItems.push({
+        id,
+        text,
+        level,
+        element: heading
+      });
+    });
+    
+    return tocItems;
+  };
+
+  // Helper function to smooth scroll to heading
+  const scrollToHeading = (elementId: string) => {
+    const element = document.getElementById(elementId);
+    if (element) {
+      const offset = 100; // Header offset
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+      
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Generate table of contents when post loads
+  const [tableOfContents, setTableOfContents] = useState<Array<{id: string, text: string, level: number}>>([]);
+
+  useEffect(() => {
+    if (post && (post as any).content) {
+      const toc = generateTableOfContents((post as any).content);
+      setTableOfContents(toc);
+    }
+  }, [post, (post as any).content]);
+
+  // Apply heading IDs to the rendered content after mount
+  useEffect(() => {
+    if (tableOfContents.length > 0) {
+      const contentElement = document.querySelector('.prose');
+      if (contentElement) {
+        const headings = contentElement.querySelectorAll('h1, h2, h3, h4, h5, h6');
+        headings.forEach((heading, index) => {
+          if (tableOfContents[index]) {
+            heading.id = tableOfContents[index].id;
+          }
+        });
+      }
+    }
+  }, [tableOfContents]);
+
   const updateStructuredData = (title: string, description: string, url: string, date: string, image?: string) => {
     // Remove existing structured data
     const existingScript = document.querySelector('script[type="application/ld+json"][data-structured-data="blog-post"]');
@@ -120,7 +190,7 @@ export default function BlogPostPage() {
     }
 
     // Create new structured data
-    const structuredData = {
+    const structuredData: any = {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
       "headline": title,
@@ -180,41 +250,44 @@ export default function BlogPostPage() {
 
   return (
     <PublicPageLayout>
-      <article className="min-h-screen">
+      <article className="min-h-screen bg-background">
         {/* Hero Section */}
-        <div className="bg-gradient-to-b from-background to-muted/20 border-b">
-          <div className="container max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <div className="bg-gradient-to-b from-background via-muted/10 to-background border-b border-border">
+          <div className="container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
             {/* Breadcrumb */}
-            <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-8">
-              <a href="/" className="hover:text-foreground transition-colors">Home</a>
-              <span>/</span>
-              <a href="/blog" className="hover:text-foreground transition-colors">Blog</a>
-              <span>/</span>
-              <span className="text-foreground truncate max-w-[200px] sm:max-w-none">{post.title}</span>
+            <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6 sm:mb-8">
+              <a href="/" className="hover:text-foreground transition-colors font-medium">Home</a>
+              <span className="text-border">/</span>
+              <a href="/blog" className="hover:text-foreground transition-colors font-medium">Blog</a>
+              <span className="text-border">/</span>
+              <span className="text-foreground font-medium truncate max-w-[150px] sm:max-w-[200px] md:max-w-none">{post.title}</span>
             </nav>
 
             {/* Featured Image */}
             {(post as any).featured_image && (
-              <div className="mb-8 -mx-4 sm:mx-0">
-                <img
-                  src={(post as any).featured_image}
-                  alt={post.title}
-                  className="w-full h-[300px] sm:h-[400px] lg:h-[500px] object-cover"
-                />
+              <div className="mb-8 sm:mb-12 -mx-4 sm:mx-0">
+                <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-2xl">
+                  <img
+                    src={(post as any).featured_image}
+                    alt={post.title}
+                    className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none"></div>
+                </div>
               </div>
             )}
 
             {/* Title Section */}
-            <div className="text-center mb-8">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-6 leading-tight text-foreground">
+            <div className="text-center mb-8 sm:mb-12">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight mb-6 sm:mb-8 leading-tight sm:leading-tight md:leading-tight text-foreground">
                 {post.title}
               </h1>
               
               {/* Meta Information */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="h-4 w-4" />
-                  <time dateTime={post.created_at}>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm sm:text-base text-muted-foreground">
+                <div className="flex items-center gap-2 bg-muted/50 px-3 py-2 rounded-full">
+                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <time dateTime={post.created_at} className="font-medium">
                     {new Date(post.created_at).toLocaleDateString("en-US", { 
                       year: "numeric", 
                       month: "long", 
@@ -223,78 +296,147 @@ export default function BlogPostPage() {
                   </time>
                 </div>
                 {(post as any).categories?.name && (
-                  <>
-                    <span className="hidden sm:inline">•</span>
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary font-medium">
-                      <Tag className="h-3.5 w-3.5" />
+                  <div className="flex items-center gap-2 bg-primary/10 px-3 py-2 rounded-full">
+                    <Tag className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                    <span className="text-primary font-medium">
                       {(post as any).categories.name}
                     </span>
-                  </>
+                  </div>
                 )}
               </div>
             </div>
 
             {/* Excerpt */}
             {(post as any).excerpt && (
-              <div className="max-w-3xl mx-auto mb-8">
-                <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed text-center italic border-l-4 border-primary/30 pl-6 py-2">
-                  {(post as any).excerpt}
-                </p>
+              <div className="max-w-4xl mx-auto mb-8 sm:mb-12">
+                <div className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-l-4 border-primary rounded-r-xl p-6 sm:p-8">
+                  <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed sm:leading-relaxed md:leading-relaxed text-center font-medium">
+                    {(post as any).excerpt}
+                  </p>
+                </div>
               </div>
             )}
           </div>
         </div>
 
         {/* Content Section */}
-        <div className="container max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-          <div className="max-w-3xl mx-auto">
-            {/* Table of Contents - for long posts */}
-            {(post as any).content && (post as any).content.length > 2000 && (
-              <div className="bg-muted/30 rounded-xl p-6 mb-12 border">
-                <h2 className="text-lg font-semibold mb-4 text-foreground">Table of Contents</h2>
-                <div className="prose prose-sm max-w-none text-muted-foreground">
-                  {/* This would need to be generated from headings in the content */}
-                  <p className="text-sm">Table of contents will be automatically generated from headings in your content.</p>
-                </div>
+        <div className="container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+          <div className="max-w-4xl mx-auto">
+            {/* Reading Time and Table of Contents */}
+            <div className="mb-8 sm:mb-12 flex flex-col lg:flex-row gap-6 lg:gap-8">
+              {/* Reading Time */}
+              <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 px-4 py-2 rounded-lg w-fit">
+                <span>📖</span>
+                <span>{Math.ceil(((post as any).content?.length || 0) / 1000)} min read</span>
               </div>
-            )}
+              
+              {/* Table of Contents */}
+              {tableOfContents.length > 0 && (
+                <div className="flex-1 bg-gradient-to-br from-muted/20 to-muted/10 rounded-2xl p-4 sm:p-6 border border-border shadow-lg">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                      <span className="text-primary font-bold text-sm">📋</span>
+                    </div>
+                    <h3 className="text-base sm:text-lg font-bold text-foreground">Table of Contents</h3>
+                    <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
+                      {tableOfContents.length} sections
+                    </span>
+                  </div>
+                  <nav className="space-y-1 max-h-48 overflow-y-auto">
+                    {tableOfContents.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => scrollToHeading(item.id)}
+                        className={`block w-full text-left px-3 py-2 rounded-lg transition-all duration-200 hover:bg-primary/10 hover:text-primary hover:translate-x-1 group text-left ${
+                          item.level === 1 ? 'font-semibold text-sm' :
+                          item.level === 2 ? 'font-medium text-sm pl-6' :
+                          item.level === 3 ? 'text-sm pl-10' :
+                          'text-xs pl-14'
+                        } text-muted-foreground hover:text-foreground`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <span className="text-primary/50 group-hover:text-primary transition-colors">
+                            {item.level === 1 ? '•' : item.level === 2 ? '◦' : '▪'}
+                          </span>
+                          <span className="truncate">{item.text}</span>
+                        </span>
+                      </button>
+                    ))}
+                  </nav>
+                  <div className="mt-3 pt-3 border-t border-border/50">
+                    <p className="text-xs text-muted-foreground text-center">
+                      Click any section to navigate directly
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
 
-            {/* Article Content */}
-            <div className="prose prose-lg prose-headings:font-bold prose-headings:tracking-tight max-w-none">
+          {/* Article Content - Justified and Enhanced */}
+            <div className="prose prose-sm sm:prose-base lg:prose-lg xl:prose-xl max-w-none">
               <div
-                className="prose prose-lg max-w-none"
+                className="prose prose-sm sm:prose-base lg:prose-lg xl:prose-xl max-w-none text-foreground leading-relaxed sm:leading-relaxed lg:leading-relaxed"
+                style={{ textAlign: 'justify', textJustify: 'inter-word' }}
                 dangerouslySetInnerHTML={{ __html: post.content || "" }}
               />
             </div>
 
             {/* Article Footer */}
-            <div className="mt-16 pt-8 border-t border-border">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-sm text-muted-foreground">
-                  Published on {new Date(post.created_at).toLocaleDateString("en-US", { 
-                    year: "numeric", 
-                    month: "long", 
-                    day: "numeric" 
-                  })}
+            <div className="mt-12 sm:mt-16 lg:mt-20 pt-8 sm:pt-10 border-t border-border">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+                <div className="text-sm sm:text-base text-muted-foreground text-center sm:text-left">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-primary">📝</span>
+                    <span>Published</span>
+                  </div>
+                  <time dateTime={post.created_at} className="font-medium">
+                    {new Date(post.created_at).toLocaleDateString("en-US", { 
+                      weekday: 'long',
+                      year: "numeric", 
+                      month: "long", 
+                      day: "numeric" 
+                    })}
+                  </time>
                 </div>
                 <Button 
                   onClick={() => navigate("/blog")} 
                   variant="outline"
-                  className="gap-2"
+                  size="lg"
+                  className="gap-2 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 h-auto"
                 >
-                  <ArrowLeft className="h-4 w-4" />
+                  <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
                   Back to Blog
                 </Button>
               </div>
             </div>
 
+            {/* Share Section */}
+            <div className="mt-12 sm:mt-16 lg:mt-20 pt-8 sm:pt-10 border-t border-border">
+              <h3 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-foreground text-center">Share this article</h3>
+              <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <span>📧</span> Email
+                </Button>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <span>🔗</span> Copy Link
+                </Button>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <span>📱</span> WhatsApp
+                </Button>
+              </div>
+            </div>
+
             {/* Related Posts Section */}
-            <div className="mt-16 pt-8 border-t border-border">
-              <h2 className="text-2xl font-bold mb-8 text-foreground">Related Articles</h2>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* This would show related blog posts */}
-                <div className="bg-muted/30 rounded-xl p-6 text-center text-muted-foreground">
-                  <p className="text-sm">Related articles will appear here based on category and tags.</p>
+            <div className="mt-16 sm:mt-20 lg:mt-24 pt-8 sm:pt-10 border-t border-border">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-12 text-foreground text-center">Related Articles</h2>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {/* Related posts placeholder */}
+                <div className="bg-gradient-to-br from-muted/20 to-muted/10 rounded-2xl p-6 sm:p-8 text-center border border-border hover:border-primary/50 transition-colors">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-primary text-xl">📄</span>
+                  </div>
+                  <h3 className="font-semibold text-foreground mb-2">More Articles Coming Soon</h3>
+                  <p className="text-sm text-muted-foreground">Related articles will appear here based on category and tags.</p>
                 </div>
               </div>
             </div>

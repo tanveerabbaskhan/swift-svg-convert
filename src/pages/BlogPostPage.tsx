@@ -56,26 +56,26 @@ export default function BlogPostPage() {
 
   // Helper functions to update meta tags
   const updateMetaTag = (name: string, content: string) => {
-    // Remove ALL existing meta tags with this name/property
-    document.querySelectorAll(`meta[name="${name}"], meta[property="${name}"]`).forEach(tag => tag.remove());
-    
-    // Create new meta tag
-    const tag = document.createElement('meta');
-    tag.setAttribute(name.startsWith('og:') || name.startsWith('twitter:') ? 'property' : 'name', name);
+    // Find existing meta tag or create new one
+    let tag = document.querySelector(`meta[name="${name}"]`) || 
+               document.querySelector(`meta[property="${name}"]`);
+    if (!tag) {
+      tag = document.createElement('meta');
+      tag.setAttribute(name.startsWith('og:') || name.startsWith('twitter:') ? 'property' : 'name', name);
+      document.head.appendChild(tag);
+    }
     tag.setAttribute('content', content);
-    document.head.appendChild(tag);
   };
 
   const updateCanonicalTag = (href: string) => {
-    // Remove ALL existing canonical tags
-    document.querySelectorAll('link[rel="canonical"]').forEach(tag => tag.remove());
-    
-    // Create new canonical tag
-    const canonical = document.createElement('link');
-    canonical.setAttribute('rel', 'canonical');
+    // Find existing canonical tag or create new one
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
     canonical.setAttribute('href', href);
-    document.head.appendChild(canonical);
-    
     console.log('Updated canonical URL to:', href);
   };
 
@@ -97,12 +97,12 @@ export default function BlogPostPage() {
         excerpt: (finalPost as any).excerpt
       });
       
-      // Aggressive SEO update function
+      // Simple, clean SEO update
       const updateSEO = () => {
         // Update document title
         document.title = title;
         
-        // Update or create meta tags with higher priority
+        // Update meta tags
         updateMetaTag('description', description);
         updateMetaTag('og:title', title);
         updateMetaTag('og:description', description);
@@ -118,48 +118,14 @@ export default function BlogPostPage() {
         // Update canonical URL to the blog post URL
         updateCanonicalTag(url);
         
-        // Also set article structured data
+        // Set article structured data
         updateStructuredData(title, description, url, finalPost.created_at, image);
         
         console.log('Blog post SEO updated successfully');
       };
 
-      // Remove any suspicious scripts
-      const removeSuspiciousScripts = () => {
-        const scripts = document.querySelectorAll('script[src]');
-        scripts.forEach(script => {
-          const src = script.getAttribute('src');
-          if (src && src.includes('pngtosvgconverter.com') && src.length > 50) {
-            console.warn('Removing suspicious script:', src);
-            script.remove();
-          }
-        });
-      };
-
-      // Initial update
-      requestAnimationFrame(() => {
-        removeSuspiciousScripts();
-        updateSEO();
-      });
-      
-      // Continuous updates to override any script injections
-      const intervals = [
-        setInterval(updateSEO, 1000),
-        setInterval(removeSuspiciousScripts, 2000)
-      ];
-      
-      // Also run on DOM changes
-      const observer = new MutationObserver(() => {
-        removeSuspiciousScripts();
-        updateSEO();
-      });
-      
-      observer.observe(document.head, { childList: true, subtree: true });
-      
-      return () => {
-        intervals.forEach(clearInterval);
-        observer.disconnect();
-      };
+      // Simple single update with requestAnimationFrame
+      requestAnimationFrame(updateSEO);
     }
   }, [finalPost]);
 

@@ -54,6 +54,28 @@ export default function BlogPostPage() {
     }
   }, [finalPost]);
 
+  // Helper functions to update meta tags
+  const updateMetaTag = (name: string, content: string) => {
+    let tag = document.querySelector(`meta[name="${name}"]`) || 
+               document.querySelector(`meta[property="${name}"]`);
+    if (!tag) {
+      tag = document.createElement('meta');
+      tag.setAttribute(name.startsWith('og:') || name.startsWith('twitter:') ? 'property' : 'name', name);
+      document.head.appendChild(tag);
+    }
+    tag.setAttribute('content', content);
+  };
+
+  const updateCanonicalTag = (href: string) => {
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', href);
+  };
+
   // Set document title and meta tags when post loads
   useEffect(() => {
     if (finalPost) {
@@ -114,98 +136,6 @@ export default function BlogPostPage() {
       updateCanonicalTag('https://pngtosvgconverter.com/');
     };
   }, [finalPost]);
-
-  // Helper functions to update meta tags
-  const updateMetaTag = (name: string, content: string) => {
-    let tag = document.querySelector(`meta[name="${name}"]`) || 
-               document.querySelector(`meta[property="${name}"]`);
-    if (!tag) {
-      tag = document.createElement('meta');
-      tag.setAttribute(name.startsWith('og:') || name.startsWith('twitter:') ? 'property' : 'name', name);
-      document.head.appendChild(tag);
-    }
-    tag.setAttribute('content', content);
-  };
-
-  const updateCanonicalTag = (href: string) => {
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
-      document.head.appendChild(canonical);
-    }
-    canonical.setAttribute('href', href);
-  };
-
-  // Helper function to generate table of contents from HTML content
-  const generateTableOfContents = (htmlContent: string) => {
-    if (!htmlContent) return [];
-    
-    // Create a temporary DOM element to parse HTML
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlContent;
-    
-    const headings = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6');
-    const tocItems = [];
-    
-    headings.forEach((heading, index) => {
-      const text = heading.textContent || '';
-      const level = parseInt(heading.tagName.charAt(1));
-      const id = `heading-${index}`;
-      
-      // Add ID to the heading for smooth scrolling
-      heading.id = id;
-      
-      tocItems.push({
-        id,
-        text,
-        level,
-        element: heading
-      });
-    });
-    
-    return tocItems;
-  };
-
-  // Helper function to smooth scroll to heading
-  const scrollToHeading = (elementId: string) => {
-    const element = document.getElementById(elementId);
-    if (element) {
-      const offset = 100; // Header offset
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
-  };
-
-  // Generate table of contents when post loads
-  const [tableOfContents, setTableOfContents] = useState<Array<{id: string, text: string, level: number}>>([]);
-
-  useEffect(() => {
-    if (finalPost && (finalPost as any).content) {
-      const toc = generateTableOfContents((finalPost as any).content);
-      setTableOfContents(toc);
-    }
-  }, [finalPost, (finalPost as any).content]);
-
-  // Apply heading IDs to the rendered content after mount
-  useEffect(() => {
-    if (tableOfContents.length > 0) {
-      const contentElement = document.querySelector('.prose');
-      if (contentElement) {
-        const headings = contentElement.querySelectorAll('h1, h2, h3, h4, h5, h6');
-        headings.forEach((heading, index) => {
-          if (tableOfContents[index]) {
-            heading.id = tableOfContents[index].id;
-          }
-        });
-      }
-    }
-  }, [tableOfContents]);
 
   const updateStructuredData = (title: string, description: string, url: string, date: string, image?: string) => {
     // Remove existing structured data
@@ -298,198 +228,148 @@ export default function BlogPostPage() {
     <ErrorBoundary>
       <PublicPageLayout>
         <article className="min-h-screen bg-background">
-        {/* Hero Section */}
-        <div className="bg-gradient-to-b from-background via-muted/10 to-background border-b border-border">
-          <div className="container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-            {/* Breadcrumb */}
-            <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6 sm:mb-8">
-              <Link to="/" className="hover:text-foreground transition-colors font-medium">Home</Link>
-              <span className="text-border">/</span>
-              <Link to="/blog" className="hover:text-foreground transition-colors font-medium">Blog</Link>
-              <span className="text-border">/</span>
-              <span className="text-foreground font-medium truncate max-w-[150px] sm:max-w-[200px] md:max-w-none">{finalPost.title}</span>
-            </nav>
+          {/* Hero Section */}
+          <div className="bg-gradient-to-b from-background via-muted/10 to-background border-b border-border">
+            <div className="container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+              {/* Breadcrumb */}
+              <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6 sm:mb-8">
+                <Link to="/" className="hover:text-foreground transition-colors font-medium">Home</Link>
+                <span className="text-border">/</span>
+                <Link to="/blog" className="hover:text-foreground transition-colors font-medium">Blog</Link>
+                <span className="text-border">/</span>
+                <span className="text-foreground font-medium truncate max-w-[150px] sm:max-w-[200px] md:max-w-none">{finalPost.title}</span>
+              </nav>
 
-            {/* Featured Image */}
-            {(finalPost as any).featured_image && (
-              <div className="mb-8 sm:mb-12 -mx-4 sm:mx-0">
-                <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-2xl">
-                  <img
-                    src={(finalPost as any).featured_image}
-                    alt={finalPost.title}
-                    className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none"></div>
-                </div>
-              </div>
-            )}
-
-            {/* Title Section */}
-            <div className="text-center mb-8 sm:mb-12">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight mb-6 sm:mb-8 leading-tight sm:leading-tight md:leading-tight text-foreground">
-                {finalPost.title}
-              </h1>
-              
-              {/* Meta Information */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm sm:text-base text-muted-foreground">
-                <div className="flex items-center gap-2 bg-muted/50 px-3 py-2 rounded-full">
-                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <time dateTime={finalPost.created_at} className="font-medium">
-                    {new Date(finalPost.created_at).toLocaleDateString("en-US", { 
-                      year: "numeric", 
-                      month: "long", 
-                      day: "numeric" 
-                    })}
-                  </time>
-                </div>
-                {(finalPost as any).categories?.name && (
-                  <div className="flex items-center gap-2 bg-primary/10 px-3 py-2 rounded-full">
-                    <Tag className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                    <span className="text-primary font-medium">
-                      {(finalPost as any).categories.name}
-                    </span>
+              {/* Featured Image */}
+              {(finalPost as any).featured_image && (
+                <div className="mb-8 sm:mb-12 -mx-4 sm:mx-0">
+                  <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-2xl">
+                    <img
+                      src={(finalPost as any).featured_image}
+                      alt={finalPost.title}
+                      className="w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none"></div>
                   </div>
-                )}
-              </div>
-            </div>
-
-            {/* Excerpt */}
-            {(finalPost as any).excerpt && (
-              <div className="max-w-4xl mx-auto mb-8 sm:mb-12">
-                <div className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-l-4 border-primary rounded-r-xl p-6 sm:p-8">
-                  <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed sm:leading-relaxed md:leading-relaxed text-center font-medium">
-                    {(finalPost as any).excerpt}
-                  </p>
                 </div>
-              </div>
-            )}
-          </div>
-        </div>
+              )}
 
-        {/* Content Section */}
-        <div className="container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
-          <div className="max-w-4xl mx-auto">
-            {/* Reading Time and Table of Contents */}
-            <div className="mb-8 sm:mb-12 flex flex-col lg:flex-row gap-6 lg:gap-8">
-              {/* Reading Time */}
-              <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 px-4 py-2 rounded-lg w-fit">
-                <span>📖</span>
-                <span>{Math.ceil(((finalPost as any).content?.length || 0) / 1000)} min read</span>
-              </div>
-              
-              {/* Table of Contents */}
-              {tableOfContents.length > 0 && (
-                <div className="flex-1 bg-gradient-to-br from-muted/20 to-muted/10 rounded-2xl p-4 sm:p-6 border border-border shadow-lg">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-                      <span className="text-primary font-bold text-sm">📋</span>
+              {/* Title Section */}
+              <div className="text-center mb-8 sm:mb-12">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight mb-6 sm:mb-8 leading-tight sm:leading-tight md:leading-tight text-foreground">
+                  {finalPost.title}
+                </h1>
+                
+                {/* Meta Information */}
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm sm:text-base text-muted-foreground">
+                  <div className="flex items-center gap-2 bg-muted/50 px-3 py-2 rounded-full">
+                    <Calendar className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <time dateTime={finalPost.created_at} className="font-medium">
+                      {new Date(finalPost.created_at).toLocaleDateString("en-US", { 
+                        year: "numeric", 
+                        month: "long", 
+                        day: "numeric" 
+                      })}
+                    </time>
+                  </div>
+                  {(finalPost as any).categories?.name && (
+                    <div className="flex items-center gap-2 bg-primary/10 px-3 py-2 rounded-full">
+                      <Tag className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                      <span className="text-primary font-medium">
+                        {(finalPost as any).categories.name}
+                      </span>
                     </div>
-                    <h3 className="text-base sm:text-lg font-bold text-foreground">Table of Contents</h3>
-                    <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
-                      {tableOfContents.length} sections
-                    </span>
-                  </div>
-                  <nav className="space-y-1 max-h-48 overflow-y-auto">
-                    {tableOfContents.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => scrollToHeading(item.id)}
-                        className={`block w-full text-left px-3 py-2 rounded-lg transition-all duration-200 hover:bg-primary/10 hover:text-primary hover:translate-x-1 group text-left ${
-                          item.level === 1 ? 'font-semibold text-sm' :
-                          item.level === 2 ? 'font-medium text-sm pl-6' :
-                          item.level === 3 ? 'text-sm pl-10' :
-                          'text-xs pl-14'
-                        } text-muted-foreground hover:text-foreground`}
-                      >
-                        <span className="flex items-center gap-2">
-                          <span className="text-primary/50 group-hover:text-primary transition-colors">
-                            {item.level === 1 ? '•' : item.level === 2 ? '◦' : '▪'}
-                          </span>
-                          <span className="truncate">{item.text}</span>
-                        </span>
-                      </button>
-                    ))}
-                  </nav>
-                  <div className="mt-3 pt-3 border-t border-border/50">
-                    <p className="text-xs text-muted-foreground text-center">
-                      Click any section to navigate directly
+                  )}
+                </div>
+              </div>
+
+              {/* Excerpt */}
+              {(finalPost as any).excerpt && (
+                <div className="max-w-4xl mx-auto mb-8 sm:mb-12">
+                  <div className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 border-l-4 border-primary rounded-r-xl p-6 sm:p-8">
+                    <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed sm:leading-relaxed md:leading-relaxed text-center font-medium">
+                      {(finalPost as any).excerpt}
                     </p>
                   </div>
                 </div>
               )}
             </div>
+          </div>
 
-          {/* Article Content - Justified and Enhanced */}
-            <div className="prose prose-sm sm:prose-base lg:prose-lg xl:prose-xl max-w-none">
-              <div
-                className="prose prose-sm sm:prose-base lg:prose-lg xl:prose-xl max-w-none text-foreground leading-relaxed sm:leading-relaxed lg:leading-relaxed"
-                style={{ textAlign: 'justify', textJustify: 'inter-word' }}
-                dangerouslySetInnerHTML={{ __html: finalPost.content || "" }}
-              />
-            </div>
+          {/* Content Section */}
+          <div className="container max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+            <div className="max-w-4xl mx-auto">
+              {/* Article Content - Justified and Enhanced */}
+              <div className="prose prose-sm sm:prose-base lg:prose-lg xl:prose-xl max-w-none">
+                <div
+                  className="prose prose-sm sm:prose-base lg:prose-lg xl:prose-xl max-w-none text-foreground leading-relaxed sm:leading-relaxed lg:leading-relaxed"
+                  style={{ textAlign: 'justify', textJustify: 'inter-word' }}
+                  dangerouslySetInnerHTML={{ __html: finalPost.content || "" }}
+                />
+              </div>
 
-            {/* Article Footer */}
-            <div className="mt-12 sm:mt-16 lg:mt-20 pt-8 sm:pt-10 border-t border-border">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
-                <div className="text-sm sm:text-base text-muted-foreground text-center sm:text-left">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-primary">📝</span>
-                    <span>Published</span>
+              {/* Article Footer */}
+              <div className="mt-12 sm:mt-16 lg:mt-20 pt-8 sm:pt-10 border-t border-border">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+                  <div className="text-sm sm:text-base text-muted-foreground text-center sm:text-left">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-primary">📝</span>
+                      <span>Published</span>
+                    </div>
+                    <time dateTime={finalPost.created_at} className="font-medium">
+                      {new Date(finalPost.created_at).toLocaleDateString("en-US", { 
+                        weekday: 'long',
+                        year: "numeric", 
+                        month: "long", 
+                        day: "numeric" 
+                      })}
+                    </time>
                   </div>
-                  <time dateTime={finalPost.created_at} className="font-medium">
-                    {new Date(finalPost.created_at).toLocaleDateString("en-US", { 
-                      weekday: 'long',
-                      year: "numeric", 
-                      month: "long", 
-                      day: "numeric" 
-                    })}
-                  </time>
+                  <Button 
+                    onClick={() => navigate("/blog")} 
+                    variant="outline"
+                    size="lg"
+                    className="gap-2 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 h-auto"
+                  >
+                    <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
+                    Back to Blog
+                  </Button>
                 </div>
-                <Button 
-                  onClick={() => navigate("/blog")} 
-                  variant="outline"
-                  size="lg"
-                  className="gap-2 text-sm sm:text-base px-4 sm:px-6 py-2 sm:py-3 h-auto"
-                >
-                  <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-                  Back to Blog
-                </Button>
               </div>
-            </div>
 
-            {/* Share Section */}
-            <div className="mt-12 sm:mt-16 lg:mt-20 pt-8 sm:pt-10 border-t border-border">
-              <h3 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-foreground text-center">Share this article</h3>
-              <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
-                <Button variant="outline" size="sm" className="gap-2">
-                  <span>📧</span> Email
-                </Button>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <span>🔗</span> Copy Link
-                </Button>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <span>📱</span> WhatsApp
-                </Button>
+              {/* Share Section */}
+              <div className="mt-12 sm:mt-16 lg:mt-20 pt-8 sm:pt-10 border-t border-border">
+                <h3 className="text-xl sm:text-2xl font-bold mb-6 sm:mb-8 text-foreground text-center">Share this article</h3>
+                <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <span>📧</span> Email
+                  </Button>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <span>🔗</span> Copy Link
+                  </Button>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <span>📱</span> WhatsApp
+                  </Button>
+                </div>
               </div>
-            </div>
 
-            {/* Related Posts Section */}
-            <div className="mt-16 sm:mt-20 lg:mt-24 pt-8 sm:pt-10 border-t border-border">
-              <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-12 text-foreground text-center">Related Articles</h2>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                {/* Related posts placeholder */}
-                <div className="bg-gradient-to-br from-muted/20 to-muted/10 rounded-2xl p-6 sm:p-8 text-center border border-border hover:border-primary/50 transition-colors">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-primary text-xl">📄</span>
+              {/* Related Posts Section */}
+              <div className="mt-16 sm:mt-20 lg:mt-24 pt-8 sm:pt-10 border-t border-border">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-8 sm:mb-12 text-foreground text-center">Related Articles</h2>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                  {/* Related posts placeholder */}
+                  <div className="bg-gradient-to-br from-muted/20 to-muted/10 rounded-2xl p-6 sm:p-8 text-center border border-border hover:border-primary/50 transition-colors">
+                    <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-primary text-xl">📄</span>
+                    </div>
+                    <h3 className="font-semibold text-foreground mb-2">More Articles Coming Soon</h3>
+                    <p className="text-sm text-muted-foreground">Related articles will appear here based on category and tags.</p>
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2">More Articles Coming Soon</h3>
-                  <p className="text-sm text-muted-foreground">Related articles will appear here based on category and tags.</p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </article>
+        </article>
       </PublicPageLayout>
     </ErrorBoundary>
   );

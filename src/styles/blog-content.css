@@ -1,0 +1,156 @@
+/* Blog content styling - ensures TipTap editor output displays correctly */
+
+.prose {
+  /* Base typography */
+  line-height: 1.7;
+  color: hsl(var(--foreground));
+}
+
+/* Headings */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  color: hsl(var(--foreground));
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose h1 {
+  font-size: 2.25em;
+  margin-top: 2em;
+  margin-bottom: 1em;
+}
+
+.prose h2 {
+  font-size: 1.875em;
+  margin-top: 1.75em;
+  margin-bottom: 0.75em;
+}
+
+.prose h3 {
+  font-size: 1.5em;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+/* Paragraphs */
+.prose p {
+  margin-bottom: 1em;
+  line-height: 1.7;
+}
+
+/* Links */
+.prose a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.prose a:hover {
+  text-decoration: none;
+}
+
+/* Lists */
+.prose ul,
+.prose ol {
+  margin-bottom: 1em;
+  padding-left: 2em;
+}
+
+.prose li {
+  margin-bottom: 0.5em;
+  line-height: 1.6;
+}
+
+/* Blockquotes */
+.prose blockquote {
+  border-left: 4px solid hsl(var(--primary) / 0.5);
+  padding-left: 1em;
+  margin: 1.5em 0;
+  font-style: italic;
+  color: hsl(var(--muted-foreground));
+  background: hsl(var(--muted) / 0.3);
+  padding: 1em;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+/* Code */
+.prose code {
+  background: hsl(var(--muted));
+  padding: 0.125em 0.375em;
+  border-radius: 0.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875em;
+}
+
+.prose pre {
+  background: hsl(var(--muted));
+  padding: 1em;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  border: 1px solid hsl(var(--border));
+  margin: 1.5em 0;
+}
+
+.prose pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* Images */
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1em 0;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Horizontal rules */
+.prose hr {
+  border: none;
+  border-top: 2px solid hsl(var(--border));
+  margin: 2em 0;
+}
+
+/* Strong text */
+.prose strong {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+/* Emphasis */
+.prose em {
+  font-style: italic;
+  color: hsl(var(--foreground));
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .prose {
+    color: hsl(var(--foreground));
+  }
+  
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    color: hsl(var(--foreground));
+  }
+  
+  .prose strong {
+    color: hsl(var(--foreground));
+  }
+  
+  .prose em {
+    color: hsl(var(--foreground));
+  }
+}

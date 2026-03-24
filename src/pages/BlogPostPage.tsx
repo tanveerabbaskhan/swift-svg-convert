@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Loader2, Calendar, ArrowLeft, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect } from "react";
+import "@/styles/blog-content.css";
 
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -89,21 +90,7 @@ export default function BlogPostPage() {
 
         {/* Content */}
         <div
-          className="prose prose-lg max-w-none prose-headings:font-bold prose-headings:tracking-tight
-            prose-h1:text-3xl prose-h1:font-bold prose-h1:mt-8 prose-h1:mb-4 prose-h1:leading-tight
-            prose-h2:text-2xl prose-h2:font-bold prose-h2:mt-6 prose-h2:mb-3 prose-h2:leading-tight
-            prose-h3:text-xl prose-h3:font-semibold prose-h3:mt-4 prose-h3:mb-2 prose-h3:leading-tight
-            prose-p:leading-relaxed prose-p:text-foreground prose-p:mb-4
-            prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-            prose-img:rounded-xl prose-img:shadow-md
-            prose-blockquote:border-l-primary/50 prose-blockquote:bg-muted/30 prose-blockquote:py-4 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
-            prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm
-            prose-pre:bg-muted prose-pre:rounded-xl prose-pre:p-4 prose-pre:font-mono prose-pre:text-sm prose-pre:overflow-x-auto
-            prose-ul:list-disc prose-ul:pl-6 prose-ul:mb-4
-            prose-ol:list-decimal prose-ol:pl-6 prose-ol:mb-4
-            prose-li:mb-2 prose-li:text-foreground
-            prose-strong:text-foreground prose-strong:font-semibold
-            dark:prose-invert"
+          className="prose prose-lg max-w-none"
           dangerouslySetInnerHTML={{ __html: post.content || "" }}
         />
       </article>

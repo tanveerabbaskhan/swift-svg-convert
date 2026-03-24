@@ -21,9 +21,7 @@ async function fetchFromSupabase(table, select) {
     // Fallback data for development when env vars are not available
     if (table === "blog_posts") {
       return [
-        { slug: "png-to-svg-converter-complete-guide", updated_at: "2026-03-24T00:00:00Z", noindex: false },
-        { slug: "how-to-convert-png-to-svg-online", updated_at: "2026-03-24T00:00:00Z", noindex: false },
-        { slug: "best-svg-converter-tools-2026", updated_at: "2026-03-24T00:00:00Z", noindex: false }
+        { slug: "png-to-svg-converter-complete-guide", updated_at: "2026-03-24T00:00:00Z", noindex: false }
       ];
     }
     if (table === "pages") {

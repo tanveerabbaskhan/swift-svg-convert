@@ -27,16 +27,32 @@ export default function RichTextEditor({ value, onChange, placeholder = "Start w
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
-        codeBlock: { HTMLAttributes: { class: "rounded-lg bg-muted p-4 font-mono text-sm" } },
-        blockquote: { HTMLAttributes: { class: "border-l-4 border-primary/40 pl-4 italic text-muted-foreground" } },
-        horizontalRule: { HTMLAttributes: { class: "my-6 border-border" } },
+        codeBlock: { 
+          HTMLAttributes: { class: "bg-muted p-4 rounded-lg font-mono text-sm overflow-x-auto border" }
+        },
+        blockquote: { 
+          HTMLAttributes: { class: "border-l-4 border-primary/50 pl-4 italic" }
+        },
+        horizontalRule: { 
+          HTMLAttributes: { class: "border-border my-8 border-t" }
+        },
+        listItem: {
+          HTMLAttributes: { class: "my-1" }
+        },
+        paragraph: {
+          HTMLAttributes: { class: "mb-4 leading-relaxed" }
+        }
       }),
       Link.configure({
         openOnClick: false,
-        HTMLAttributes: { class: "text-primary underline cursor-pointer" },
+        HTMLAttributes: { 
+          class: "text-primary hover:underline underline font-medium transition-colors"
+        },
       }),
       Image.configure({
-        HTMLAttributes: { class: "rounded-lg max-w-full h-auto my-4" },
+        HTMLAttributes: { 
+          class: "rounded-lg max-w-full h-auto my-4 shadow-md border"
+        },
         allowBase64: true,
       }),
       Placeholder.configure({ placeholder }),

@@ -10,6 +10,7 @@
     "generate:blog-static": "node scripts/generate-blog-static-files.mjs",
     "generate:sitemap": "node scripts/generate-sitemap.mjs",
     "verify:seo": "node scripts/verify-seo-setup.mjs",
+    "security:audit": "node scripts/security-audit.mjs",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",

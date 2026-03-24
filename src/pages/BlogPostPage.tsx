@@ -56,46 +56,49 @@ export default function BlogPostPage() {
 
   // Helper functions to update meta tags
   const updateMetaTag = (name: string, content: string) => {
-    let tag = document.querySelector(`meta[name="${name}"]`) || 
-               document.querySelector(`meta[property="${name}"]`);
-    if (!tag) {
-      tag = document.createElement('meta');
-      tag.setAttribute(name.startsWith('og:') || name.startsWith('twitter:') ? 'property' : 'name', name);
-      document.head.appendChild(tag);
-    }
+    // Remove ALL existing meta tags with this name/property
+    document.querySelectorAll(`meta[name="${name}"], meta[property="${name}"]`).forEach(tag => tag.remove());
+    
+    // Create new meta tag
+    const tag = document.createElement('meta');
+    tag.setAttribute(name.startsWith('og:') || name.startsWith('twitter:') ? 'property' : 'name', name);
     tag.setAttribute('content', content);
+    document.head.appendChild(tag);
   };
 
   const updateCanonicalTag = (href: string) => {
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.setAttribute('rel', 'canonical');
-      document.head.appendChild(canonical);
-    }
+    // Remove ALL existing canonical tags
+    document.querySelectorAll('link[rel="canonical"]').forEach(tag => tag.remove());
+    
+    // Create new canonical tag
+    const canonical = document.createElement('link');
+    canonical.setAttribute('rel', 'canonical');
     canonical.setAttribute('href', href);
+    document.head.appendChild(canonical);
+    
+    console.log('Updated canonical URL to:', href);
   };
 
   // Set document title and meta tags when post loads
   useEffect(() => {
     if (finalPost) {
-      // Use requestAnimationFrame to ensure this runs after all other head updates
+      const title = (finalPost as any).meta_title || `${finalPost.title} — PNGTOSVG`;
+      const description = (finalPost as any).meta_description || (finalPost as any).excerpt || "Convert PNG images to SVG vector graphics instantly. Free, fast, and secure.";
+      const url = `https://pngtosvgconverter.com/blog/${finalPost.slug}`;
+      const image = (finalPost as any).featured_image;
+      
+      console.log('Updating blog post SEO:', { 
+        title, 
+        description, 
+        url,
+        metaTitle: (finalPost as any).meta_title,
+        metaDescription: (finalPost as any).meta_description,
+        postTitle: finalPost.title,
+        excerpt: (finalPost as any).excerpt
+      });
+      
+      // Aggressive SEO update function
       const updateSEO = () => {
-        const title = (finalPost as any).meta_title || `${finalPost.title} — PNGTOSVG`;
-        const description = (finalPost as any).meta_description || (finalPost as any).excerpt || "Convert PNG images to SVG vector graphics instantly. Free, fast, and secure.";
-        const url = `https://pngtosvgconverter.com/blog/${finalPost.slug}`;
-        const image = (finalPost as any).featured_image;
-        
-        console.log('Updating blog post SEO:', { 
-          title, 
-          description, 
-          url,
-          metaTitle: (finalPost as any).meta_title,
-          metaDescription: (finalPost as any).meta_description,
-          postTitle: finalPost.title,
-          excerpt: (finalPost as any).excerpt
-        });
-        
         // Update document title
         document.title = title;
         
@@ -112,7 +115,7 @@ export default function BlogPostPage() {
         updateMetaTag('twitter:description', description);
         updateMetaTag('twitter:image', image || 'https://pngtosvgconverter.com/og-image.jpg');
         
-        // Update canonical URL
+        // Update canonical URL to the blog post URL
         updateCanonicalTag(url);
         
         // Also set article structured data
@@ -121,20 +124,43 @@ export default function BlogPostPage() {
         console.log('Blog post SEO updated successfully');
       };
 
-      // Multiple attempts to ensure it overrides any other head updates
-      requestAnimationFrame(updateSEO);
-      const timeout1 = setTimeout(updateSEO, 100);
-      const timeout2 = setTimeout(updateSEO, 500);
+      // Remove any suspicious scripts
+      const removeSuspiciousScripts = () => {
+        const scripts = document.querySelectorAll('script[src]');
+        scripts.forEach(script => {
+          const src = script.getAttribute('src');
+          if (src && src.includes('pngtosvgconverter.com') && src.length > 50) {
+            console.warn('Removing suspicious script:', src);
+            script.remove();
+          }
+        });
+      };
+
+      // Initial update
+      requestAnimationFrame(() => {
+        removeSuspiciousScripts();
+        updateSEO();
+      });
+      
+      // Continuous updates to override any script injections
+      const intervals = [
+        setInterval(updateSEO, 1000),
+        setInterval(removeSuspiciousScripts, 2000)
+      ];
+      
+      // Also run on DOM changes
+      const observer = new MutationObserver(() => {
+        removeSuspiciousScripts();
+        updateSEO();
+      });
+      
+      observer.observe(document.head, { childList: true, subtree: true });
       
       return () => {
-        clearTimeout(timeout1);
-        clearTimeout(timeout2);
+        intervals.forEach(clearInterval);
+        observer.disconnect();
       };
     }
-    return () => { 
-      document.title = "Free PNG to SVG Converter Online — No Signup, No Watermark";
-      updateCanonicalTag('https://pngtosvgconverter.com/');
-    };
   }, [finalPost]);
 
   const updateStructuredData = (title: string, description: string, url: string, date: string, image?: string) => {

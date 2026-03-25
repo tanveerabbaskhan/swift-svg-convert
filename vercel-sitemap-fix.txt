@@ -1,0 +1,57 @@
+IMMEDIATE FIX - BYPASS VERCEL CACHE ISSUE
+
+PROBLEM: Vercel is not deploying the updated sitemap.xml file
+
+SOLUTION: Create a direct API route to serve the correct sitemap
+
+1. Go to your Vercel dashboard
+2. Create a new file: api/sitemap.js
+3. Add this code to serve the correct sitemap:
+
+export default function handler(req, res) {
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://pngtosvgconverter.com/</loc>
+    <lastmod>2026-03-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://pngtosvgconverter.com/about</loc>
+    <lastmod>2026-03-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://pngtosvgconverter.com/contact</loc>
+    <lastmod>2026-03-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://pngtosvgconverter.com/privacy</loc>
+    <lastmod>2026-03-25</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://pngtosvgconverter.com/blog</loc>
+    <lastmod>2026-03-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://pngtosvgconverter.com/blog/png-to-svg-converter-complete-guide</loc>
+    <lastmod>2026-03-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>`;
+
+  res.setHeader('Content-Type', 'application/xml');
+  res.status(200).send(sitemap);
+}
+
+This will bypass the static file and serve the correct sitemap directly!

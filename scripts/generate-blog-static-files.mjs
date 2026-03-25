@@ -54,12 +54,13 @@ async function fetchFromSupabase(table, select) {
   }
 }
 
-function generateBlogPostHTML(post) {
+function generateBlogHTML(post) {
   const title = post.meta_title || `${post.title} — PNGTOSVG`;
   const description = post.meta_description || post.excerpt || "Convert PNG images to SVG vector graphics instantly. Free, fast, and secure.";
-  const image = post.featured_image || "https://pngtosvgconverter.com/og-image.jpg";
-  const publishDate = post.created_at ? new Date(post.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-  const updateDate = post.updated_at ? new Date(post.updated_at).toISOString().split('T')[0] : publishDate;
+  const url = `${BASE_URL}/blog/${post.slug}`;
+  const image = post.featured_image || `${BASE_URL}/og-image.jpg`;
+  const publishedDate = post.created_at || new Date().toISOString();
+  const modifiedDate = post.updated_at || publishedDate;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -68,20 +69,21 @@ function generateBlogPostHTML(post) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${escapeHtml(title)}</title>
     <meta name="description" content="${escapeHtml(description)}">
+    <meta name="author" content="PNGTOSVG">
     <meta name="robots" content="index, follow">
-    <link rel="canonical" href="${BASE_URL}/blog/${post.slug}">
+    <link rel="canonical" href="${url}">
     
     <!-- Open Graph -->
     <meta property="og:title" content="${escapeHtml(title)}">
     <meta property="og:description" content="${escapeHtml(description)}">
     <meta property="og:type" content="article">
-    <meta property="og:url" content="${BASE_URL}/blog/${post.slug}">
+    <meta property="og:url" content="${url}">
     <meta property="og:site_name" content="PNGTOSVG">
     <meta property="og:image" content="${image}">
-    <meta property="article:published_time" content="${post.created_at}">
-    <meta property="article:modified_time" content="${post.updated_at}">
+    <meta property="article:published_time" content="${publishedDate}">
+    <meta property="article:modified_time" content="${modifiedDate}">
     
-    <!-- Twitter -->
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="${escapeHtml(title)}">
     <meta name="twitter:description" content="${escapeHtml(description)}">
@@ -90,149 +92,136 @@ function generateBlogPostHTML(post) {
     <!-- Article Structured Data -->
     <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
-        "headline": "${escapeHtml(title)}",
-        "description": "${escapeHtml(description)}",
-        "url": "${BASE_URL}/blog/${post.slug}",
-        "datePublished": "${post.created_at}",
-        "dateModified": "${post.updated_at}",
-        "author": {
-            "@type": "Organization",
-            "name": "PNGTOSVG"
-        },
-        "publisher": {
-            "@type": "Organization",
-            "name": "PNGTOSVG",
-            "url": "${BASE_URL}"
-        },
-        "mainEntityOfPage": {
-            "@type": "WebPage",
-            "@id": "${BASE_URL}/blog/${post.slug}"
-        },
-        "image": "${image}"
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "${escapeHtml(post.title)}",
+      "description": "${escapeHtml(description)}",
+      "url": "${url}",
+      "image": "${image}",
+      "datePublished": "${publishedDate}",
+      "dateModified": "${modifiedDate}",
+      "author": {
+        "@type": "Organization",
+        "name": "PNGTOSVG",
+        "url": "${BASE_URL}"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "PNGTOSVG",
+        "url": "${BASE_URL}",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "${BASE_URL}/logo.png"
+        }
+      },
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "${url}"
+      }
     }
     </script>
     
-    <!-- Redirect to app after 1 second -->
-    <meta http-equiv="refresh" content="1;url=/blog/${post.slug}">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" href="/favicon.png">
     
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
             margin: 0;
             padding: 0;
             background: #f8fafc;
-            color: #1e293b;
-            line-height: 1.6;
         }
-        .container {
+        .blog-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 2rem;
+            background: white;
+            min-height: 100vh;
         }
-        .header {
+        .blog-header {
             text-align: center;
             margin-bottom: 2rem;
         }
-        .title {
+        .blog-title {
             font-size: 2.5rem;
             font-weight: bold;
+            color: #1e293b;
             margin-bottom: 1rem;
-            color: #0f172a;
-            line-height: 1.2;
         }
-        .meta {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
+        .blog-meta {
+            color: #64748b;
             font-size: 0.9rem;
-            color: #64748b;
         }
-        .description {
-            font-size: 1.25rem;
-            color: #64748b;
+        .blog-content {
+            color: #334155;
+            line-height: 1.8;
+        }
+        .blog-footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+        }
+        .redirect-notice {
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 0.5rem;
+            padding: 1rem;
             margin-bottom: 2rem;
             text-align: center;
         }
-        .content {
-            background: white;
-            padding: 2rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-        }
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .spinner {
-            border: 4px solid #e2e8f0;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .featured-image {
-            width: 100%;
-            max-width: 600px;
-            height: auto;
-            border-radius: 0.5rem;
-            margin: 0 auto 2rem;
-            display: block;
-        }
-        .breadcrumb {
-            text-align: center;
-            margin-bottom: 2rem;
-            font-size: 0.9rem;
-            color: #64748b;
-        }
-        .breadcrumb a {
-            color: #3b82f6;
+        .redirect-notice a {
+            color: #0ea5e9;
             text-decoration: none;
+            font-weight: 600;
         }
-        .breadcrumb a:hover {
+        .redirect-notice a:hover {
             text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="breadcrumb">
-            <a href="${BASE_URL}">Home</a> / <a href="${BASE_URL}/blog">Blog</a> / ${escapeHtml(post.title)}
+    <div class="blog-container">
+        <div class="redirect-notice">
+            <strong>Interactive Version Available:</strong> 
+            <a href="/blog/${post.slug}">Click here for the full interactive experience</a>
+            <br><small>You'll be redirected automatically in 10 seconds...</small>
         </div>
         
-        <div class="header">
-            <h1 class="title">${escapeHtml(post.title)}</h1>
-            <div class="meta">
-                <span>📅 Published: ${publishDate}</span>
-                ${post.updated_at !== post.created_at ? `<span>🔄 Updated: ${updateDate}</span>` : ''}
+        <header class="blog-header">
+            <h1 class="blog-title">${escapeHtml(post.title)}</h1>
+            <div class="blog-meta">
+                Published on ${new Date(publishedDate).toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                })}
             </div>
-            ${post.excerpt ? `<p class="description">${escapeHtml(post.excerpt)}</p>` : ''}
-        </div>
+        </header>
         
-        ${post.featured_image ? `<img src="${post.featured_image}" alt="${escapeHtml(post.title)}" class="featured-image" />` : ''}
+        <main class="blog-content">
+            ${post.content ? post.content : `<p>${escapeHtml(post.excerpt || 'Loading content...')}</p>`}
+        </main>
         
-        <div class="content">
-            <div>${post.content || 'Loading content...'}</div>
-        </div>
-        
-        <div class="loading">
-            <div class="spinner"></div>
-            <p>Loading interactive version...</p>
-            <p><small>If you're not redirected automatically, <a href="/blog/${post.slug}">click here</a>.</small></p>
-        </div>
+        <footer class="blog-footer">
+            <p>
+                <strong>Want to convert PNG to SVG?</strong><br>
+                Try our free online tool at <a href="/">PNGTOSVG Converter</a>
+            </p>
+            <p style="margin-top: 1rem; font-size: 0.85rem; color: #64748b;">
+                © 2024 PNGTOSVG. All rights reserved.
+            </p>
+        </footer>
     </div>
+
+    <script>
+        // Auto-redirect to interactive version after 10 seconds
+        setTimeout(() => {
+            window.location.href = '/blog/${post.slug}';
+        }, 10000);
+    </script>
 </body>
 </html>`;
 }

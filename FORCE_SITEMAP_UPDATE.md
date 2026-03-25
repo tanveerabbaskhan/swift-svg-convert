@@ -1,0 +1,58 @@
+# FORCE SITEMAP UPDATE
+
+The live sitemap at https://www.pngtosvgconverter.com/sitemap.xml still has issues:
+
+## Current Problems:
+1. Missing XSL stylesheet reference
+2. Still has duplicate .html URLs
+
+## Required Fix:
+Replace the sitemap.xml content with:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://pngtosvgconverter.com/</loc>
+    <lastmod>2026-03-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://pngtosvgconverter.com/about</loc>
+    <lastmod>2026-03-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://pngtosvgconverter.com/contact</loc>
+    <lastmod>2026-03-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://pngtosvgconverter.com/privacy</loc>
+    <lastmod>2026-03-25</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+  </url>
+  <url>
+    <loc>https://pngtosvgconverter.com/blog</loc>
+    <lastmod>2026-03-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://pngtosvgconverter.com/blog/png-to-svg-converter-complete-guide</loc>
+    <lastmod>2026-03-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>
+```
+
+## Action:
+1. Run `npm run build` to regenerate sitemap
+2. Commit and push to trigger Vercel deployment
+3. Verify the sitemap has XSL reference and no duplicates

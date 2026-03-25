@@ -260,7 +260,7 @@ async function generateBlogStaticFiles() {
   let generatedCount = 0;
   for (const post of posts) {
     try {
-      const html = generateBlogPostHTML(post);
+      const html = generateBlogHTML(post);
       const filePath = resolve(blogDir, `${post.slug}.html`);
       writeFileSync(filePath, html, 'utf-8');
       console.log(`[blog-static] Generated: ${post.slug}.html`);

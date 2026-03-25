@@ -265,7 +265,14 @@ export default function SEOPage() {
         updateSetting.mutateAsync({ key: "homepage_meta_description", value: homepageMeta.meta_description }),
       ]);
       toast.success("Homepage meta settings saved successfully!");
+      
+      // Reload the page after successful save
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+      
     } catch (error) {
+      console.error("Failed to save homepage meta settings:", error);
       toast.error("Failed to save homepage meta settings");
     }
   };
@@ -313,8 +320,18 @@ export default function SEOPage() {
   ];
 
   const scored = allItems.map(item => {
-    const { score, issues } = scorePageSEO(item);
-    return { ...item, score, issues, status: score >= 80 ? "good" : score >= 50 ? "warning" : "error" };
+    const { score, issues, good, warnings, readability, keywordDensity, wordCount } = scoreAdvancedSEO(item);
+    return { 
+      ...item, 
+      score, 
+      issues, 
+      good, 
+      warnings,
+      readability,
+      keywordDensity,
+      wordCount,
+      status: score >= 90 ? "good" : score >= 75 ? "warning" : "error" 
+    };
   }).sort((a, b) => a.score - b.score);
 
   const avgScore = scored.length ? Math.round(scored.reduce((s, i) => s + i.score, 0) / scored.length) : 0;
@@ -323,11 +340,27 @@ export default function SEOPage() {
   const warningPages = scored.filter(p => p.status === "warning").length;
   const errorPages = scored.filter(p => p.status === "error").length;
 
-  const handleSaveSettings = () => {
-    Object.entries(seoSettings).forEach(([key, value]) => {
-      updateSetting.mutate({ key, value });
-    });
-    toast.success("SEO settings saved");
+  const handleSaveSettings = async () => {
+    try {
+      // Convert all settings to promises
+      const promises = Object.entries(seoSettings).map(([key, value]) => 
+        updateSetting.mutateAsync({ key, value })
+      );
+      
+      // Wait for all settings to be saved
+      await Promise.all(promises);
+      
+      toast.success("SEO settings saved successfully!");
+      
+      // Optional: Reload the page after successful save
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+      
+    } catch (error) {
+      console.error("Failed to save SEO settings:", error);
+      toast.error("Failed to save SEO settings");
+    }
   };
 
   return (

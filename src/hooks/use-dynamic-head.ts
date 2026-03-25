@@ -53,17 +53,81 @@ export function useDynamicHead() {
       meta.content = settings.google_search_console;
     }
 
-    // Google Analytics
+    // Enhanced Google Analytics 4 with comprehensive tracking
     if (settings.google_analytics_id && settings.google_analytics_id.startsWith("G-")) {
       const gaId = settings.google_analytics_id;
       if (!document.querySelector(`script[src*="${gaId}"]`)) {
+        // Google Analytics 4 gtag.js
         const script1 = document.createElement("script");
         script1.async = true;
         script1.src = `https://www.googletagmanager.com/gtag/js?id=${gaId}`;
         document.head.appendChild(script1);
 
+        // Enhanced GA4 configuration with custom tracking
         const script2 = document.createElement("script");
-        script2.textContent = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaId}');`;
+        script2.textContent = `
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          
+          // Enhanced GA4 Configuration
+          gtag('config', '${gaId}', {
+            page_title: document.title,
+            page_location: window.location.href,
+            content_group: 'PNG to SVG Converter',
+            custom_map: {
+              'conversion_type': 'png_to_svg_conversion',
+              'tool_usage': 'converter_interaction',
+              'file_size': 'upload_size_category'
+            },
+            send_page_view: true,
+            allow_google_signals: false,
+            allow_ad_personalization_signals: false
+          });
+          
+          // Custom event tracking for conversions
+          window.trackConversion = function(fileSize, conversionTime) {
+            gtag('event', 'png_to_svg_conversion', {
+              'event_category': 'conversions',
+              'event_label': 'successful_conversion',
+              'conversion_type': 'png_to_svg_conversion',
+              'file_size_bytes': fileSize,
+              'conversion_time_ms': conversionTime,
+              'value': 1
+            });
+          };
+          
+          // Track file upload attempts
+          window.trackFileUpload = function(fileSize, fileType) {
+            gtag('event', 'file_upload', {
+              'event_category': 'user_interaction',
+              'event_label': 'upload_attempt',
+              'file_size_bytes': fileSize,
+              'file_type': fileType,
+              'tool_usage': 'converter_interaction'
+            });
+          };
+          
+          // Track tool feature usage
+          window.trackFeatureUsage = function(featureName, action) {
+            gtag('event', 'feature_usage', {
+              'event_category': 'engagement',
+              'event_label': featureName,
+              'action': action,
+              'tool_usage': 'converter_interaction'
+            });
+          };
+          
+          // Track error events
+          window.trackError = function(errorType, errorMessage) {
+            gtag('event', 'error', {
+              'event_category': 'system',
+              'event_label': errorType,
+              'error_message': errorMessage,
+              'non_interaction': true
+            });
+          };
+        `;
         document.head.appendChild(script2);
       }
     }

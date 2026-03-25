@@ -1,25 +1,166 @@
-import { CheckCircle2, AlertTriangle, XCircle, RefreshCw, Save, Globe, FileText, Code, Share2, Home, Trash2 } from "lucide-react";
+import { CheckCircle2, AlertTriangle, XCircle, RefreshCw, Save, Globe, FileText, Code, Share2, Home, Trash2, Search, Eye, Zap, Shield, Target, TrendingUp, Users, Clock, Image, Link, Settings, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { usePages, useBlogPosts, useSiteSettings, useUpdateSiteSetting, useUpdatePage, useUpdateBlogPost } from "@/hooks/use-cms-data";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import SEOComplianceDashboard from "@/components/SEOComplianceDashboard";
 
-function scorePageSEO(page: { meta_title?: string | null; meta_description?: string | null; title: string; content?: string | null }) {
+// Advanced SEO scoring algorithm like Yoast
+function scoreAdvancedSEO(page: { 
+  meta_title?: string | null; 
+  meta_description?: string | null; 
+  title: string; 
+  content?: string | null;
+  slug?: string;
+  featured_image?: string | null;
+  meta_keywords?: string | null;
+}) {
   let score = 0;
   const issues: string[] = [];
-  if (page.meta_title && page.meta_title.length > 0) { score += 30; if (page.meta_title.length > 60) issues.push("Meta title too long (>60 chars)"); }
-  else { issues.push("Missing meta title"); }
-  if (page.meta_description && page.meta_description.length > 0) { score += 30; if (page.meta_description.length > 160) issues.push("Meta description too long (>160 chars)"); }
-  else { issues.push("Missing meta description"); }
-  if (page.content && page.content.length > 100) score += 20;
-  else issues.push("Content too short");
-  if (page.title.length > 0) score += 20;
-  return { score: Math.min(score, 100), issues };
+  const good: string[] = [];
+  const warnings: string[] = [];
+
+  // Title analysis (30 points)
+  if (page.meta_title && page.meta_title.length > 0) {
+    score += 15;
+    if (page.meta_title.length >= 30 && page.meta_title.length <= 60) {
+      score += 10;
+      good.push("Meta title length is optimal (30-60 chars)");
+    } else if (page.meta_title.length > 60) {
+      warnings.push("Meta title is too long (>60 chars)");
+      score += 5;
+    } else {
+      warnings.push("Meta title is short (<30 chars)");
+      score += 7;
+    }
+    
+    // Check if title contains keywords
+    if (page.meta_title.toLowerCase().includes('png') || page.meta_title.toLowerCase().includes('svg')) {
+      score += 5;
+      good.push("Title contains relevant keywords");
+    }
+  } else {
+    issues.push("Missing meta title");
+  }
+
+  // Description analysis (25 points)
+  if (page.meta_description && page.meta_description.length > 0) {
+    score += 12;
+    if (page.meta_description.length >= 120 && page.meta_description.length <= 160) {
+      score += 10;
+      good.push("Meta description length is optimal (120-160 chars)");
+    } else if (page.meta_description.length > 160) {
+      warnings.push("Meta description is too long (>160 chars)");
+      score += 6;
+    } else if (page.meta_description.length < 120) {
+      warnings.push("Meta description is short (<120 chars)");
+      score += 8;
+    }
+    
+    // Check if description contains keywords
+    if (page.meta_description.toLowerCase().includes('png') || page.meta_description.toLowerCase().includes('svg')) {
+      score += 3;
+      good.push("Description contains relevant keywords");
+    }
+  } else {
+    issues.push("Missing meta description");
+  }
+
+  // Content analysis (20 points)
+  if (page.content && page.content.length > 0) {
+    const wordCount = page.content.split(/\s+/).length;
+    if (wordCount >= 300) {
+      score += 15;
+      good.push(`Content has good word count (${wordCount} words)`);
+    } else if (wordCount >= 150) {
+      score += 10;
+      warnings.push(`Content could be longer (${wordCount} words)`);
+    } else {
+      score += 5;
+      issues.push(`Content is too short (${wordCount} words)`);
+    }
+
+    // Check for keyword density
+    const contentLower = page.content.toLowerCase();
+    const keywordCount = (contentLower.match(/png|svg/g) || []).length;
+    const keywordDensity = (keywordCount / wordCount) * 100;
+    
+    if (keywordDensity >= 1 && keywordDensity <= 3) {
+      score += 5;
+      good.push("Good keyword density (1-3%)");
+    } else if (keywordDensity > 3) {
+      warnings.push("Keyword density might be too high");
+      score += 2;
+    }
+  } else {
+    issues.push("Missing content");
+  }
+
+  // Image analysis (15 points)
+  if (page.featured_image) {
+    score += 10;
+    good.push("Has featured image");
+    // In a real implementation, you'd check if the image has alt text
+    score += 5;
+  } else {
+    warnings.push("No featured image found");
+  }
+
+  // URL structure (10 points)
+  if (page.slug) {
+    if (page.slug.length <= 50 && !page.slug.includes('_')) {
+      score += 10;
+      good.push("URL structure is good");
+    } else {
+      warnings.push("URL could be optimized");
+      score += 5;
+    }
+  }
+
+  return { 
+    score: Math.min(score, 100), 
+    issues, 
+    good, 
+    warnings,
+    readability: calculateReadability(page.content || ""),
+    keywordDensity: calculateKeywordDensity(page.content || ""),
+    wordCount: page.content ? page.content.split(/\s+/).length : 0
+  };
+}
+
+function calculateReadability(content: string): number {
+  if (!content) return 0;
+  
+  const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  const words = content.split(/\s+/).filter(w => w.length > 0);
+  
+  if (sentences.length === 0 || words.length === 0) return 0;
+  
+  const avgWordsPerSentence = words.length / sentences.length;
+  const avgCharsPerWord = words.reduce((sum, word) => sum + word.length, 0) / words.length;
+  
+  // Simplified Flesch Reading Ease score
+  const score = 206.835 - (1.015 * avgWordsPerSentence) - (84.6 * (avgCharsPerWord / 4.7));
+  
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+function calculateKeywordDensity(content: string): number {
+  if (!content) return 0;
+  
+  const words = content.split(/\s+/).filter(w => w.length > 0);
+  const keywords = content.toLowerCase().match(/png|svg/g) || [];
+  
+  return words.length > 0 ? Number(((keywords.length / words.length) * 100).toFixed(2)) : 0;
 }
 
 export default function SEOPage() {
@@ -36,6 +177,57 @@ export default function SEOPage() {
     google_search_console: "",
     social_twitter: "",
     social_facebook: "",
+    bing_webmaster: "",
+    pinterest_verify: "",
+    facebook_domain: "",
+    site_author: "",
+    site_description: "",
+    og_image: "",
+    twitter_image: "",
+    favicon: "",
+    enable_sitemap: true,
+    enable_rss: true,
+    enable_amp: false,
+    enable_structured_data: true,
+    enable_social_meta: true,
+    enable_analytics: true,
+    enable_webmaster_tools: true,
+    default_robots: "index, follow",
+    title_separator: "—",
+    home_title: "",
+    home_description: "",
+    enable_social_open_graph: true,
+    enable_twitter_cards: true,
+    enable_facebook_og: true,
+    enable_json_ld: true,
+    enable_breadcrumbs: true,
+    enable_canonical_urls: true,
+    enable_xml_sitemap: true,
+    enable_rss_feed: true,
+    social_image_width: "1200",
+    social_image_height: "630",
+    twitter_username: "",
+    facebook_app_id: "",
+    instagram_profile: "",
+    linkedin_profile: "",
+    youtube_channel: "",
+    enable_local_seo: true,
+    business_name: "",
+    business_type: "OnlineService",
+    business_phone: "",
+    business_email: "",
+    business_address: "",
+    business_city: "",
+    business_state: "",
+    business_zip: "",
+    business_country: "",
+    business_lat: "",
+    business_lng: "",
+    business_hours: "",
+    enable_tracking: true,
+    tracking_anonymize_ip: true,
+    tracking_ad_personalization: false,
+    tracking_enhanced_ecommerce: false,
   });
 
   // Homepage meta settings
@@ -620,6 +812,19 @@ export default function SEOPage() {
             </Button>
           </div>
         </div>
+      </div>
+
+      {/* Google SEO Compliance Dashboard */}
+      <div className="mt-8">
+        <SEOComplianceDashboard pageData={{
+          title: homepageMeta.meta_title || settings?.site_name || "PNGTOSVG",
+          meta_title: homepageMeta.meta_title,
+          meta_description: homepageMeta.meta_description,
+          content: settings?.site_description,
+          slug: window.location.pathname,
+          featured_image: settings?.og_image,
+          type: 'page'
+        }} />
       </div>
     </div>
   );

@@ -1,8 +1,9 @@
-import { CheckCircle2, AlertTriangle, XCircle, RefreshCw, Save, Globe, FileText, Code, Share2 } from "lucide-react";
+import { CheckCircle2, AlertTriangle, XCircle, RefreshCw, Save, Globe, FileText, Code, Share2, Home, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { usePages, useBlogPosts, useSiteSettings, useUpdateSiteSetting, useUpdatePage, useUpdateBlogPost } from "@/hooks/use-cms-data";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState, useEffect } from "react";
@@ -37,6 +38,14 @@ export default function SEOPage() {
     social_facebook: "",
   });
 
+  // Homepage meta settings
+  const [homepageMeta, setHomepageMeta] = useState({
+    meta_title: "",
+    meta_description: "",
+  });
+
+  const [isClearingCache, setIsClearingCache] = useState(false);
+
   useEffect(() => {
     if (settings) {
       setSeoSettings({
@@ -48,8 +57,61 @@ export default function SEOPage() {
         social_twitter: settings.social_twitter || "",
         social_facebook: settings.social_facebook || "",
       });
+
+      // Set homepage meta settings
+      setHomepageMeta({
+        meta_title: settings.homepage_meta_title || "",
+        meta_description: settings.homepage_meta_description || "",
+      });
     }
   }, [settings]);
+
+  const handleHomepageMetaSave = async () => {
+    try {
+      await Promise.all([
+        updateSetting.mutateAsync({ key: "homepage_meta_title", value: homepageMeta.meta_title }),
+        updateSetting.mutateAsync({ key: "homepage_meta_description", value: homepageMeta.meta_description }),
+      ]);
+      toast.success("Homepage meta settings saved successfully!");
+    } catch (error) {
+      toast.error("Failed to save homepage meta settings");
+    }
+  };
+
+  const handleCacheClear = async () => {
+    setIsClearingCache(true);
+    try {
+      // Clear browser cache for the homepage
+      if ('caches' in window) {
+        const cacheNames = await caches.keys();
+        await Promise.all(cacheNames.map(name => caches.delete(name)));
+      }
+
+      // Clear localStorage
+      localStorage.clear();
+
+      // Clear sessionStorage
+      sessionStorage.clear();
+
+      // Trigger a service worker update if available
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map(registration => registration.unregister()));
+      }
+
+      toast.success("Cache cleared successfully! Homepage will update on next visit.");
+
+      // Optionally reload the page after a short delay
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+
+    } catch (error) {
+      toast.error("Failed to clear cache");
+    } finally {
+      setIsClearingCache(false);
+    }
+  };
 
   const isLoading = pagesLoading || postsLoading || settingsLoading;
 
@@ -149,6 +211,129 @@ export default function SEOPage() {
               </>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Homepage Meta Management & Cache Clear */}
+      <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Homepage Meta Settings */}
+          <Card className="border-border/50 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                  <Home className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Homepage Meta Settings</CardTitle>
+                  <CardDescription>Manage homepage SEO meta tags</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="homepage-title" className="text-sm font-medium">Meta Title</Label>
+                <Input
+                  id="homepage-title"
+                  placeholder="Enter homepage meta title"
+                  value={homepageMeta.meta_title}
+                  onChange={(e) => setHomepageMeta(prev => ({ ...prev, meta_title: e.target.value }))}
+                  className="border-border/50"
+                  maxLength={60}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {homepageMeta.meta_title.length}/60 characters
+                </p>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="homepage-description" className="text-sm font-medium">Meta Description</Label>
+                <Textarea
+                  id="homepage-description"
+                  placeholder="Enter homepage meta description"
+                  value={homepageMeta.meta_description}
+                  onChange={(e) => setHomepageMeta(prev => ({ ...prev, meta_description: e.target.value }))}
+                  className="border-border/50 min-h-[100px]"
+                  maxLength={160}
+                />
+                <p className="text-xs text-muted-foreground">
+                  {homepageMeta.meta_description.length}/160 characters
+                </p>
+              </div>
+
+              <Button 
+                onClick={handleHomepageMetaSave}
+                disabled={updateSetting.isPending}
+                className="w-full bg-primary hover:bg-primary/90"
+              >
+                {updateSetting.isPending ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Homepage Meta
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Cache Clear */}
+          <Card className="border-border/50 shadow-lg">
+            <CardHeader className="bg-gradient-to-r from-orange-50 via-orange-100 to-orange-50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+                  <Trash2 className="h-5 w-5 text-orange-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl">Cache Management</CardTitle>
+                  <CardDescription>Clear website cache for updates</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 space-y-6">
+              <div className="space-y-4">
+                <div className="bg-muted/50 rounded-lg p-4">
+                  <h4 className="font-medium mb-2">What cache clearing does:</h4>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    <li>• Clears browser cache storage</li>
+                    <li>• Removes localStorage data</li>
+                    <li>• Clears sessionStorage</li>
+                    <li>• Updates service workers</li>
+                    <li>• Forces homepage content refresh</li>
+                  </ul>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-blue-800">
+                    <strong>Note:</strong> After clearing cache, the homepage will reflect your meta changes immediately for all users.
+                  </p>
+                </div>
+
+                <Button 
+                  onClick={handleCacheClear}
+                  disabled={isClearingCache}
+                  variant="outline"
+                  className="w-full border-orange-200 text-orange-700 hover:bg-orange-50"
+                >
+                  {isClearingCache ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                      Clearing Cache...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Clear All Cache
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
 

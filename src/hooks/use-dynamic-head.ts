@@ -3,8 +3,8 @@ import { useSiteSettings } from "@/hooks/use-cms-data";
 
 /**
  * Dynamically applies admin dashboard settings to the document head:
- * - Document title from default_meta_title or site_name
- * - Meta description from default_meta_description
+ * - Document title from homepage_meta_title or default_meta_title or site_name
+ * - Meta description from homepage_meta_description or default_meta_description or site_description
  * - Favicon from site_favicon
  * - Google Analytics script from google_analytics_id
  * - Google Search Console verification from google_search_console
@@ -15,16 +15,27 @@ export function useDynamicHead() {
   useEffect(() => {
     if (!settings) return;
 
-    // Document title
-    const title = settings.default_meta_title || settings.site_name;
+    // Document title - prioritize homepage meta settings
+    const title = settings.homepage_meta_title || settings.default_meta_title || settings.site_name;
     if (title) document.title = title;
 
-    // Meta description
-    const desc = settings.default_meta_description || settings.site_description;
+    // Meta description - prioritize homepage meta settings
+    const desc = settings.homepage_meta_description || settings.default_meta_description || settings.site_description;
     if (desc) {
       let meta = document.querySelector('meta[name="description"]') as HTMLMetaElement;
       if (!meta) { meta = document.createElement("meta"); meta.name = "description"; document.head.appendChild(meta); }
       meta.content = desc;
+    }
+
+    // Update canonical URL for homepage
+    const canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (canonical) {
+      canonical.href = "https://pngtosvgconverter.com/";
+    } else {
+      const newCanonical = document.createElement("link");
+      newCanonical.rel = "canonical";
+      newCanonical.href = "https://pngtosvgconverter.com/";
+      document.head.appendChild(newCanonical);
     }
 
     // Favicon
@@ -62,6 +73,33 @@ export function useDynamicHead() {
       let ogSiteName = document.querySelector('meta[property="og:site_name"]') as HTMLMetaElement;
       if (!ogSiteName) { ogSiteName = document.createElement("meta"); ogSiteName.setAttribute("property", "og:site_name"); document.head.appendChild(ogSiteName); }
       ogSiteName.content = settings.site_name;
+    }
+
+    // Update OG tags for homepage
+    const ogTitle = document.querySelector('meta[property="og:title"]') as HTMLMetaElement;
+    if (ogTitle) {
+      ogTitle.content = title;
+    }
+
+    const ogDescription = document.querySelector('meta[property="og:description"]') as HTMLMetaElement;
+    if (ogDescription) {
+      ogDescription.content = desc;
+    }
+
+    const ogUrl = document.querySelector('meta[property="og:url"]') as HTMLMetaElement;
+    if (ogUrl) {
+      ogUrl.content = "https://pngtosvgconverter.com/";
+    }
+
+    // Update Twitter tags for homepage
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]') as HTMLMetaElement;
+    if (twitterTitle) {
+      twitterTitle.content = title;
+    }
+
+    const twitterDescription = document.querySelector('meta[name="twitter:description"]') as HTMLMetaElement;
+    if (twitterDescription) {
+      twitterDescription.content = desc;
     }
   }, [settings]);
 
